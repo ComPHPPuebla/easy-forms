@@ -1,0 +1,29 @@
+{
+    "name": "comphppuebla/simple-form",
+    "description": "Simple form handling",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Luis Montealegre",
+            "email": "montealegreluis@gmail.com"
+        }
+    ],
+    "autoload": {
+        "psr-0": {
+            "Forms": "src/"
+        }
+    },
+    "config": {
+        "bin-dir": "bin/"
+    },
+    "require": {
+        "beberlei/assert": "~2.3"
+    },
+    "require-dev": {
+        "symfony/security-csrf": "~2.6",
+        "twig/twig": "~1.16",
+        "zendframework/zend-inputfilter": "~2.3",
+        "zendframework/zend-captcha": "~2.3",
+        "phpspec/phpspec": "~2.1"
+    }
+}

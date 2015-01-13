@@ -1,2 +1,3 @@
-# simple-form
-Simple form handling
+# Simple forms
+
+Simple form handling for PHP.

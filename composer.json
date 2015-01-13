@@ -25,5 +25,10 @@
         "zendframework/zend-inputfilter": "~2.3",
         "zendframework/zend-captcha": "~2.3",
         "phpspec/phpspec": "~2.1"
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.0.x-dev"
+        }
     }
 }

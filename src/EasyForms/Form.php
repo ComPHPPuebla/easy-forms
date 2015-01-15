@@ -63,7 +63,7 @@ class Form
      */
     public function values()
     {
-        array_map(function(Element $element) use (&$values) {
+        array_map(function (Element $element) use (&$values) {
             $this->values[$element->name()] = $element->value();
         }, $this->elements);
 

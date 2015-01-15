@@ -25,7 +25,7 @@ class Csrf extends Hidden
      * @param string $tokenId
      * @param TokenProvider $tokenProvider
      */
-    function __construct($name, $tokenId, TokenProvider $tokenProvider)
+    public function __construct($name, $tokenId, TokenProvider $tokenProvider)
     {
         parent::__construct($name);
         $this->setTokenId($tokenId);

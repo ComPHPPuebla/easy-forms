@@ -19,7 +19,7 @@ class ImageCaptchaAdapter implements CaptchaAdapter
     /**
      * @param Image $imageCaptcha
      */
-    function __construct(Image $imageCaptcha)
+    public function __construct(Image $imageCaptcha)
     {
         $this->imageCaptcha = $imageCaptcha;
     }

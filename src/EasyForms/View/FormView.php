@@ -21,7 +21,7 @@ class FormView extends ArrayObject
      */
     public function __construct(array $elements)
     {
-        $elements = array_map(function(Element $element) {
+        $elements = array_map(function (Element $element) {
             return $element->buildView();
         }, $elements);
 

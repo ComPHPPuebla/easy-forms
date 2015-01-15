@@ -1,5 +1,5 @@
 {% block element_row -%}
-    <div class="form-group{% if not valid %} has-error{% endif %}">
+    <div>
         {{- label(element, label, attr['id']|default(null), label_attr|default([])) -}}
         {{- element(element, attr|default([]), options|default([])) -}}
         {{- errors(element) -}}
@@ -12,14 +12,14 @@
 {%- endblock hidden_row %}
 
 {% block checkbox_row -%}
-    <div class="checkbox{% if not valid %} has-error{% endif %}">
+    <div>
         {{- block('checkbox_label') -}}
         {{- errors(element) -}}
     </div>
 {%- endblock checkbox_row %}
 
 {% block radio_row -%}
-    <div class="form-group{% if not valid %} has-error{% endif %}">
+    <div>
         {{- label(element, label, null, label_attr|default([])) -}}
         {{- element(element, attr|default([])) -}}
         {{- errors(element) -}}
@@ -27,7 +27,6 @@
 {%- endblock radio_row %}
 
 {% block textarea -%}
-    {% set attr = attr|merge({class: (attr.class|default('') ~ ' form-control')|trim}) -%}
     <textarea{{ block('attributes') }}>{{ value }}</textarea>
 {%- endblock textarea %}
 
@@ -38,21 +37,17 @@
 {%- endblock checkbox_label %}
 
 {% block input -%}
-    {%- if attr.type != 'file' and attr.type != 'hidden' and attr.type != 'checkbox' -%}
-        {% set attr = attr|merge({class: (attr.class|default('') ~ ' form-control')|trim}) -%}
-    {%- endif -%}
     <input{{ block('attributes') }}>
 {%- endblock input %}
 
 {% block captcha_image -%}
     {% set image_attr = options.image_attr|default([])|merge({
-        'class': (attr.class|default('') ~ ' img-responsive img-thumbnail center-block')|trim,
         'alt': '',
         'src': options.image_url ~ '/' ~ options.captcha_id ~ '.png'
     }) -%}
     <img{% for attrname, attrvalue in image_attr %} {{ attrname }}="{{ attrvalue }}"{% endfor %}><br>
     {% set name = attr.name -%}
-    {% set attr = attr|merge({type: 'text', name: name ~ '[input]', class: (attr.class|default('') ~ ' form-control')|trim}) -%}
+    {% set attr = attr|merge({type: 'text', name: name ~ '[input]'}) -%}
     <input{{ block('attributes') }}>
     {% set attr = attr|merge({type: 'hidden', value: options.captcha_id, name: name ~ '[id]'}) -%}
     <input{{ block('attributes') }}>
@@ -61,12 +56,11 @@
 {% block radio -%}
     {%- for value, label in choices -%}
         {% set attr = attr|merge({'value': value}) -%}
-        &nbsp;&nbsp;<label class="radio-inline"><input{{ block('attributes') }}{% if element.isSelected(value) %} checked{% endif %}>{{ label }}</label>
+        <label><input{{ block('attributes') }}{% if element.isSelected(value) %} checked{% endif %}>{{ label }}</label>
     {%- endfor -%}
 {%- endblock radio %}
 
 {% block select -%}
-    {% set attr = attr|merge({class: (attr.class|default('') ~ ' form-control')|trim}) -%}
     <select{{ block('attributes') }}{% if element.isMultiple %} multiple{% endif %}>
         {{- block('select_options') -}}
     </select>
@@ -100,9 +94,9 @@
 
 {% block errors -%}
     {%- if errors|length > 0 -%}
-        <ul class="list-unstyled">
+        <ul>
             {%- for error in errors -%}
-                <li class="text-danger"><span class="glyphicon glyphicon-exclamation-sign"></span> {{ error }}</li>
+                <li>{{ error }}</li>
             {%- endfor -%}
         </ul>
     {%- endif %}

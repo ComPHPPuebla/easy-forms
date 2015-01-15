@@ -20,7 +20,7 @@ class CsrfTokenProvider implements TokenProvider
     /**
      * @param CsrfTokenManager $tokenManager
      */
-    function __construct(CsrfTokenManager $tokenManager)
+    public function __construct(CsrfTokenManager $tokenManager)
     {
         $this->tokenManager = $tokenManager;
     }

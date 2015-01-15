@@ -18,6 +18,7 @@
         "bin-dir": "bin/"
     },
     "require": {
+        "php": ">=5.5",
         "beberlei/assert": "~2.3"
     },
     "require-dev": {

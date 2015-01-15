@@ -1,7 +1,8 @@
 {
-    "name": "comphppuebla/simple-form",
-    "description": "Simple form handling",
+    "name": "comphppuebla/easy-forms",
+    "description": "Easy form processing",
     "license": "MIT",
+    "keywords": ["forms"],
     "authors": [
         {
             "name": "Luis Montealegre",
@@ -10,7 +11,7 @@
     ],
     "autoload": {
         "psr-0": {
-            "Forms": "src/"
+            "EasyForms": "src/"
         }
     },
     "config": {

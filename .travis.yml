@@ -5,4 +5,10 @@ php:
   - 5.6
 
 before_script:
-  - composer install --dev --prefer-source
+  - composer self-update
+
+install:
+  - composer install --prefer-source --no-interaction --dev
+
+script:
+  - bin/phpspec run -v

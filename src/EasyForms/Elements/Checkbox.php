@@ -33,7 +33,7 @@ class Checkbox extends Input
 
     /**
      * @param ElementView $view
-     * @return CheckboxView
+     * @return ElementView
      */
     public function buildView(ElementView $view = null)
     {

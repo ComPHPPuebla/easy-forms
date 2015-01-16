@@ -122,7 +122,7 @@ class FormRendererDefaultLayoutTest extends TestCase
     /** @test */
     public function it_should_render_a_checkbox_element()
     {
-        $rememberMe = new Checkbox('remember_me', 'remember');
+        $rememberMe = new Checkbox('remember_me');
 
         $html = $this->renderer->renderElement($rememberMe->buildView(), ['class' => 'js-cookie']);
         $this->assertEquals(
@@ -153,6 +153,80 @@ class FormRendererDefaultLayoutTest extends TestCase
         $html = $this->renderer->renderElement($categories->buildView(), ['class' => 'js-chained']);
         $this->assertEquals(
             '<select name="categories" class="js-chained"></select>',
+            $html
+        );
+    }
+
+    /** @test */
+    public function it_should_render_an_element_row()
+    {
+        $description = new TextArea('description');
+        $description->setValue('123');
+        $description->setMessages(['Please enter a valid description']);
+
+        $html = $this->renderer->renderRow($description->buildView(), [
+            'label' => 'Description',
+            'label_attr' => ['class' => 'form-label'],
+            'attr' => ['class' => 'js-resize'],
+        ]);
+
+        $this->assertEquals(
+            '<div><label class="form-label">Description</label><textarea name="description" class="js-resize">123</textarea><ul><li>Please enter a valid description</li></ul></div>',
+            $html
+        );
+    }
+
+    /** @test */
+    public function it_should_render_a_row_with_a_hidden_element()
+    {
+        $description = new Hidden('product_id');
+        $description->setValue('123');
+        $description->setMessages(['This is not a valid product ID']);
+
+        $html = $this->renderer->renderRow($description->buildView(), [
+            'attr' => ['class' => 'js-data'],
+        ]);
+
+        $this->assertEquals(
+            '<input type="hidden" name="product_id" value="123" class="js-data"><ul><li>This is not a valid product ID</li></ul>',
+            $html
+        );
+    }
+
+    /** @test */
+    public function it_should_render_a_row_with_a_checkbox_element()
+    {
+        $rememberMe = new Checkbox('remember_me');
+        $rememberMe->setValue('remember');
+        $rememberMe->setMessages(['This is not a valid value']);
+
+        $html = $this->renderer->renderRow($rememberMe->buildView(), [
+            'label' => 'Remember me',
+            'label_attr' => ['class' => 'form-label'],
+            'attr' => ['class' => 'js-validate'],
+        ]);
+
+        $this->assertEquals(
+            '<div><label class="form-label"><input type="checkbox" name="remember_me" value="remember" checked class="js-validate">Remember me</label><ul><li>This is not a valid value</li></ul></div>',
+            $html
+        );
+    }
+
+    /** @test */
+    public function it_should_render_a_row_with_a_radio_button_element()
+    {
+        $gender = new Radio('gender', ['M' => 'Male', 'F' => 'Female']);
+        $gender->setValue('M');
+        $gender->setMessages(['This is not a valid value']);
+
+        $html = $this->renderer->renderRow($gender->buildView(), [
+            'label' => 'Gender',
+            'label_attr' => ['class' => 'form-label'],
+            'attr' => ['class' => 'js-validate'],
+        ]);
+
+        $this->assertEquals(
+            '<div><label class="form-label">Gender</label><label><input type="radio" name="gender" class="js-validate" value="M" checked>Male</label><label><input type="radio" name="gender" class="js-validate" value="F">Female</label><ul><li>This is not a valid value</li></ul></div>',
             $html
         );
     }

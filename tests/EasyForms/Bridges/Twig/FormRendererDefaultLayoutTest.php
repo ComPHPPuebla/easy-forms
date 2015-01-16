@@ -131,10 +131,9 @@ class FormRendererDefaultLayoutTest extends TestCase
         );
 
         $rememberMe->setValue('remember');
-
         $html = $this->renderer->renderElement($rememberMe->buildView(), ['class' => 'js-cookie']);
         $this->assertEquals(
-            '<input type="checkbox" name="remember_me" value="remember" class="js-cookie">', // This should be checked
+            '<input type="checkbox" name="remember_me" value="remember" checked class="js-cookie">',
             $html
         );
     }

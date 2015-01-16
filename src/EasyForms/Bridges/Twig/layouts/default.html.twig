@@ -31,7 +31,7 @@
 {%- endblock textarea %}
 
 {% block checkbox_label -%}
-    {%- set label_attr = label_attr|default([])  -%}
+    {%- set label_attr = label_attr|default([]) -%}
     <label{% for attrname, attrvalue in label_attr %} {{ attrname }}="{{ attrvalue }}"{% endfor %}>
     {{- element(element, attr|default([])) -}}{{ label }}</label>
 {%- endblock checkbox_label %}

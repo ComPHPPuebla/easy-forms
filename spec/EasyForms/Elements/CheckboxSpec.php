@@ -14,7 +14,7 @@ class CheckboxSpec extends ObjectBehavior
 {
     function it_should_have_checkbox_as_its_type_attribute()
     {
-        $this->beConstructedWith('remember_me', 'remember');
+        $this->beConstructedWith('remember_me');
 
         $view = $this->buildView();
 
@@ -23,11 +23,11 @@ class CheckboxSpec extends ObjectBehavior
 
     function it_should_build_view_with_the_correct_checked_value()
     {
-        $this->beConstructedWith('remember_me', 'remember');
+        $this->beConstructedWith('remember_me');
 
         $this->setValue('remember');
         $view = $this->buildView();
 
-        $view->isChecked->shouldBe(true);
+        $view->attributes['checked']->shouldBe(true);
     }
 }

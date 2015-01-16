@@ -14,35 +14,22 @@ use EasyForms\View\ElementView;
 
 class Checkbox extends Input
 {
-    /** @var string */
-    protected $checkedValue;
-
     /** @var array */
     protected $attributes = [
         'type' => 'checkbox',
     ];
 
     /**
-     * @param string $name
-     * @param string $checkedValue
-     * @param array $attributes
+     * If a value is set, the 'checked' attribute should be added.
+     *
+     * @param mixed $value
      */
-    public function __construct($name, $checkedValue, array $attributes = [])
+    public function setValue($value)
     {
-        parent::__construct($name, $attributes);
-        $this->setCheckedValue($checkedValue);
+        parent::setValue($value);
+        $this->attributes['checked'] = true;
     }
 
-
-    /**
-     * @param string $value
-     */
-    protected function setCheckedValue($value)
-    {
-        Assertion::notEmpty($value);
-
-        $this->checkedValue = $value;
-    }
 
     /**
      * @param ElementView $view
@@ -50,13 +37,12 @@ class Checkbox extends Input
      */
     public function buildView(ElementView $view = null)
     {
-        $view = new CheckboxView();
+        $view = new ElementView();
 
-        /** @var CheckboxView $view */
+        /** @var ElementView $view */
         $view = parent::buildView($view);
 
         $view->rowBlock = 'checkbox_row';
-        $view->isChecked = $this->value === $this->checkedValue;
 
         return $view;
     }

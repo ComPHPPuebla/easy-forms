@@ -1,3 +1,5 @@
+{% extends 'layouts/default.html.twig' %}
+
 {% block element_row -%}
     <div class="form-group{% if not valid %} has-error{% endif %}">
         {{- label(element, label, attr['id']|default(null), label_attr|default([])) -}}
@@ -5,11 +7,6 @@
         {{- errors(element) -}}
     </div>
 {%- endblock element_row %}
-
-{% block hidden_row -%}
-    {{- element(element, attr|default([])) -}}
-    {{- errors(element) -}}
-{%- endblock hidden_row %}
 
 {% block checkbox_row -%}
     <div class="checkbox{% if not valid %} has-error{% endif %}">
@@ -30,12 +27,6 @@
     {% set attr = attr|merge({class: (attr.class|default('') ~ ' form-control')|trim}) -%}
     <textarea{{ block('attributes') }}>{{ value }}</textarea>
 {%- endblock textarea %}
-
-{% block checkbox_label -%}
-    {%- set label_attr = label_attr|default([])  -%}
-    <label{% for attrname, attrvalue in label_attr %} {{ attrname }}="{{ attrvalue }}"{% endfor %}>
-    {{- element(element, attr|default([])) -}}{{ label }}</label>
-{%- endblock checkbox_label %}
 
 {% block input -%}
     {%- if attr.type != 'file' and attr.type != 'hidden' and attr.type != 'checkbox' -%}
@@ -72,32 +63,6 @@
     </select>
 {%- endblock select %}
 
-{% block select_options -%}
-    {% for group_label, choice in choices %}
-        {%- if choice is iterable -%}
-            <optgroup label="{{ group_label }}">
-                {% set options = choice %}
-                {{- block('select_options') -}}
-            </optgroup>
-        {%- else -%}
-            <option value="{{ group_label }}"{% if element.isSelected(group_label) %} selected{% endif %}>{{ choice }}</option>
-        {%- endif -%}
-    {% endfor %}
-{%- endblock select_options %}
-
-{% block form_start -%}
-    {%- if attr.method is not defined -%}{% set attr = attr|merge({'method': 'post'}) %}{%- endif -%}
-    <form{{ block('attributes') }}>
-{%- endblock form_start %}
-
-{% block form_end -%}
-    </form>
-{%- endblock form_end %}
-
-{% block label -%}
-    <label{{ block('attributes') }}>{{ label }}</label>
-{%- endblock label %}
-
 {% block errors -%}
     {%- if errors|length > 0 -%}
         <ul class="list-unstyled">
@@ -107,14 +72,3 @@
         </ul>
     {%- endif %}
 {%- endblock errors %}
-
-{% block attributes -%}
-    {%- for attrname, attrvalue in attr -%}
-        {{- " " -}}
-        {%- if attrvalue is sameas(true) -%}
-            {{- attrname }}
-        {%- elseif attrvalue is not sameas(false) -%}
-            {{- attrname }}="{{ attrvalue }}"
-        {%- endif -%}
-    {%- endfor -%}
-{%- endblock attributes %}

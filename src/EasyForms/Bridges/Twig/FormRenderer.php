@@ -8,104 +8,29 @@
  */
 namespace EasyForms\Bridges\Twig;
 
-use EasyForms\Bridges\Twig\Exception\BlockNotFoundException;
 use EasyForms\View\ElementView;
 use EasyForms\View\FormView;
-use Twig_Environment as Environment;
 use Twig_Template as Template;
 
 class FormRenderer
 {
-    /** @var Environment */
-    protected $environment;
-
-    /** @var string[] */
-    protected $paths;
-
-    /** @var Template[] */
-    protected $themes = [];
-
-    /** @var Template[] */
-    protected $cache = [];
+    /** @var Theme */
+    protected $theme;
 
     /**
-     * @param Environment $environment
-     * @param array $themePaths
+     * @param FormTheme $theme
      */
-    public function __construct(Environment $environment, array $themePaths)
+    public function __construct(FormTheme $theme)
     {
-        $this->environment = $environment;
-        $this->paths = $themePaths;
+        $this->theme = $theme;
     }
 
     /**
-     * @param Template $theme
+     * @param Template $template
      */
-    public function addTheme(Template $theme)
+    public function addTemplate(Template $template)
     {
-        $this->themes[] = $theme;
-    }
-
-    /**
-     * @param string $block
-     * @return Template
-     * @throws BlockNotFoundException
-     */
-    protected function searchThemeFor($block)
-    {
-        $this->loadThemes();
-
-        if (isset($this->cache[$block])) {
-            return $this->cache[$block];
-        }
-
-        foreach ($this->themes as $theme) {
-            if ($theme = $this->tryToCache($theme, $block)) {
-                break; // Block is defined in this template
-            }
-        }
-
-        if (!$theme) {
-            throw new BlockNotFoundException("Block '$block' is not defined in the templates of this theme.");
-        }
-
-        return $theme;
-    }
-
-    /**
-     * @param Template $theme
-     * @param string $block
-     * @return Template | null
-     */
-    protected function tryToCache(Template $theme, $block)
-    {
-        if ($theme->hasBlock($block)) {
-            $this->cache[$block] = $theme;
-
-            return $theme;
-        }
-    }
-
-    /**
-     * Lazy load all the registered themes
-     */
-    protected function loadThemes()
-    {
-        foreach ($this->paths as $path) {
-            $this->loadThemeForPath($path);
-        }
-    }
-
-    /**
-     * @param string $path
-     */
-    protected function loadThemeForPath($path)
-    {
-        if (!isset($this->themes[$path])) {
-            $template = $this->environment->loadTemplate($path);
-            $this->themes[$path] = $template;
-            $template->getParent([]) && $this->themes[$template->getParent([])->getTemplateName()] = $template->getParent([]);
-        }
+        $this->theme->addTemplate($template);
     }
 
     /**
@@ -245,11 +170,11 @@ class FormRenderer
      */
     protected function renderBlock($name, array $vars = [])
     {
-        $theme = $this->searchThemeFor($name);
+        $template = $this->theme->loadTemplateFor($name);
 
         ob_start();
 
-        $theme->displayBlock($name, $vars);
+        $template->displayBlock($name, $vars);
 
         return ob_get_clean();
     }

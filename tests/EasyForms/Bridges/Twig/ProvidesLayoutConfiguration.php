@@ -4,7 +4,7 @@
  *
  * This source file is subject to the license that is bundled with this package in the file LICENSE.
  *
- * @copyright  Mandrágora Web-Based Systems 2015 (http://www.mandragora-web-systems.com)
+ * @copyright Comunidad PHP Puebla 2015 (http://www.comunidadphppuebla.com)
  */
 namespace EasyForms\Bridges\Twig;
 
@@ -30,10 +30,9 @@ trait ProvidesLayoutConfiguration
         $this->environment = new Environment($loader, [
             'debug' => true,
             'strict_variables' => true,
-            'cache' => __DIR__ . '/cache',
         ]);
 
-        $this->renderer = new FormRenderer($this->environment, [$path]);
+        $this->renderer = new FormRenderer(new FormTheme($this->environment, [$path]));
 
         $this->environment->addExtension(new FormExtension($this->renderer));
     }

@@ -22,7 +22,7 @@ class FormThemeNode extends Node
     {
         $compiler
             ->addDebugInfo($this)
-            ->write('$this->env->getExtension(\'easy_forms\')->renderer()->addTheme(')
+            ->write('$this->env->getExtension(\'easy_forms\')->renderer()->addTemplate(')
             ->subcompile($this->getNode('theme'))
             ->raw(");\n");
     }

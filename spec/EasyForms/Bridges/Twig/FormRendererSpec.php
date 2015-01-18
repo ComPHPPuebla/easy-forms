@@ -8,6 +8,7 @@
  */
 namespace spec\EasyForms\Bridges\Twig;
 
+use EasyForms\Bridges\Twig\FormTheme;
 use EasyForms\Elements\Captcha\CaptchaAdapter;
 use EasyForms\Elements\Captcha;
 use EasyForms\Elements\File;
@@ -16,46 +17,41 @@ use EasyForms\Elements\Text;
 use EasyForms\Form;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
-use Twig_Environment as Environment;
 use Twig_Template as Template;
 
 class FormRendererSpec extends ObjectBehavior
 {
-    function let(Environment $environment, Template $template)
+    function let(FormTheme $theme)
     {
-        $this->beConstructedWith($environment, ['bootstrap3.html.twig']);
-        $environment->loadTemplate('bootstrap3.html.twig')->willReturn($template);
+        $this->beConstructedWith($theme);
     }
 
-    function it_should_render_an_element(Template $template)
+    function it_should_render_an_element(FormTheme $theme, Template $template)
     {
         $htmlAttributes = [
             'class' => 'js-highlighted'
         ];
-
         $username = new Text('username');
         $username->setValue('john.doe');
         $usernameView = $username->buildView();
+        $theme->loadTemplateFor($usernameView->block)->willReturn($template);
 
-        $template->hasBlock($usernameView->block)->willReturn(true);
-        $template->getParent([])->shouldBeCalled();
+        $this->renderElement($usernameView, $htmlAttributes);
+
         $template->displayBlock($usernameView->block, [
             'element' => $usernameView,
             'attr' => $usernameView->attributes + $htmlAttributes,
             'value' => $usernameView->value,
             'options' => [],
             'choices' => [],
-        ])->shouldBeCalled();
-
-        $this->renderElement($usernameView, $htmlAttributes);
+        ])->shouldHaveBeenCalled();
     }
 
-    function it_should_render_an_element_with_choices(Template $template)
+    function it_should_render_an_element_with_choices(FormTheme $theme, Template $template)
     {
         $htmlAttributes = [
             'class' => 'js-highlighted'
         ];
-
         $languages = new Select('languages');
         $languages->setChoices([
             'PHP' => 'PHP',
@@ -65,42 +61,40 @@ class FormRendererSpec extends ObjectBehavior
         ]);
         $languages->setValue('PHP');
         $languagesView = $languages->buildView();
+        $theme->loadTemplateFor($languagesView->block)->willReturn($template);
 
-        $template->hasBlock($languagesView->block)->willReturn(true);
-        $template->getParent([])->shouldBeCalled();
+        $this->renderElement($languagesView, $htmlAttributes);
+
         $template->displayBlock($languagesView->block, [
             'element' => $languagesView,
             'attr' => $languagesView->attributes + $htmlAttributes,
             'value' => $languagesView->value,
             'options' => [],
             'choices' => $languagesView->choices,
-        ])->shouldBeCalled();
-
-        $this->renderElement($languagesView, $htmlAttributes);
+        ])->shouldHaveBeenCalled();
     }
 
-    function it_should_render_an_element_with_options(Template $template)
+    function it_should_render_an_element_with_options(FormTheme $theme, Template $template)
     {
         $captcha = new Captcha('captcha', new FakeCaptchaAdapter());
         $captcha->setValue('1325');
         $htmlAttributes = ['class' => 'js-highlighted'];
         $captchaOptions = ['image_attr' => ['id' => 'js-captcha']];
         $captchaView = $captcha->buildView();
+        $theme->loadTemplateFor($captchaView->block)->willReturn($template);
 
-        $template->hasBlock($captchaView->block)->willReturn(true);
-        $template->getParent([])->shouldBeCalled();
+        $this->renderElement($captchaView, $htmlAttributes, $captchaOptions);
+
         $template->displayBlock($captchaView->block, [
             'element' => $captchaView,
             'attr' => $captchaView->attributes + $htmlAttributes,
             'value' => $captchaView->value,
             'options' => $captchaView->options + $captchaOptions,
             'choices' => [],
-        ])->shouldBeCalled();
-
-        $this->renderElement($captchaView, $htmlAttributes, $captchaOptions);
+        ])->shouldHaveBeenCalled();
     }
 
-    function it_should_render_a_form_row(Template $template)
+    function it_should_render_a_form_row(FormTheme $theme, Template $template)
     {
         $username = new Text('username');
         $username->setValue('john.doe');
@@ -117,9 +111,10 @@ class FormRendererSpec extends ObjectBehavior
             ],
         ];
         $usernameView = $username->buildView();
+        $theme->loadTemplateFor($usernameView->rowBlock)->willReturn($template);
 
-        $template->hasBlock(Argument::any())->willReturn(true);
-        $template->getParent([])->shouldBeCalled();
+        $this->renderRow($usernameView, $options);
+
         $template->displayBlock($usernameView->rowBlock, [
             'element' => $usernameView,
             'valid' => $usernameView->valid,
@@ -127,86 +122,78 @@ class FormRendererSpec extends ObjectBehavior
             'options' => [],
             'label' => $options['label'],
             'label_attr' => $options['label_attr'],
-        ])->shouldBeCalled();
-
-        $this->renderRow($usernameView, $options);
+        ])->shouldHaveBeenCalled();
     }
 
-    function it_should_render_an_element_errors(Template $template)
+    function it_should_render_an_element_errors(FormTheme $theme, Template $template)
     {
         $username = new Text('username');
         $username->setMessages([
             'User "john.doe" does not exist.'
         ]);
         $usernameView = $username->buildView();
-
-        $template->hasBlock('errors')->willReturn(true);
-        $template->getParent([])->shouldBeCalled();
-        $template->displayBlock('errors', [
-            'errors' => $usernameView->messages,
-        ])->shouldBeCalled();
+        $theme->loadTemplateFor('errors')->willReturn($template);
 
         $this->renderErrors($usernameView);
+
+        $template->displayBlock('errors', [
+            'errors' => $usernameView->messages,
+        ])->shouldHaveBeenCalled();
     }
 
-    function it_should_render_an_element_label(Template $template)
+    function it_should_render_an_element_label(FormTheme $theme, Template $template)
     {
         $username = new Text('username');
         $labelAttributes = ['class' => 'js-label'];
         $elementId = 'username';
         $usernameView = $username->buildView();
+        $theme->loadTemplateFor('label')->willReturn($template);
 
-        $template->hasBlock('label')->willReturn(true);
-        $template->getParent([])->shouldBeCalled();
+        $this->renderLabel($usernameView, 'Username', $elementId, $labelAttributes);
+
         $template->displayBlock('label', [
             'label' => 'Username',
             'attr' => $labelAttributes + ['for' => $elementId],
             'is_required' => $usernameView->isRequired,
-        ])->shouldBeCalled();
-
-        $this->renderLabel($usernameView, 'Username', $elementId, $labelAttributes);
+        ])->shouldHaveBeenCalled();
     }
 
-    function it_should_render_the_opening_tag_of_a_form(Template $template)
+    function it_should_render_the_opening_tag_of_a_form(FormTheme $theme, Template $template)
     {
         $form = new Form();
         $form->add(new Text('username'));
         $formAttributes = ['name' => 'login'];
         $formView = $form->buildView();
-
-        $template->hasBlock('form_start')->willReturn(true);
-        $template->getParent([])->shouldBeCalled();
-        $template->displayBlock('form_start', [
-            'attr' => $formView->attributes + $formAttributes,
-        ])->shouldBeCalled();
+        $theme->loadTemplateFor('form_start')->willReturn($template);
 
         $this->renderFormStart($formView, $formAttributes);
+
+        $template->displayBlock('form_start', [
+            'attr' => $formView->attributes + $formAttributes,
+        ])->shouldHaveBeenCalled();
     }
 
-    function it_should_render_the_opening_tag_of_a_multipart_form(Template $template)
+    function it_should_render_the_opening_tag_of_a_multipart_form(FormTheme $theme, Template $template)
     {
         $form = new Form();
         $form->add(new File('avatar'));
         $formView = $form->buildView();
-
-        $template->hasBlock('form_start')->willReturn(true);
-        $template->getParent([])->shouldBeCalled();
-        $template->displayBlock('form_start', [
-            'attr' => $formView->attributes + ['enctype' => 'multipart/form-data'],
-        ])->shouldBeCalled();
+        $theme->loadTemplateFor('form_start')->willReturn($template);
 
         $this->renderFormStart($formView);
 
-
+        $template->displayBlock('form_start', [
+            'attr' => $formView->attributes + ['enctype' => 'multipart/form-data'],
+        ])->shouldHaveBeenCalled();
     }
 
-    function it_should_render_the_closing_tag_of_a_form(Template $template)
+    function it_should_render_the_closing_tag_of_a_form(FormTheme $theme, Template $template)
     {
-        $template->hasBlock('form_end')->willReturn(true);
-        $template->getParent([])->shouldBeCalled();
-        $template->displayBlock('form_end', [])->shouldBeCalled();
+        $theme->loadTemplateFor('form_end')->willReturn($template);
 
         $this->renderFormEnd();
+
+        $template->displayBlock('form_end', [])->shouldHaveBeenCalled();
     }
 }
 

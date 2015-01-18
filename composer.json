@@ -11,8 +11,11 @@
     ],
     "autoload": {
         "psr-0": {
-            "EasyForms": "src/"
+            "EasyForms\\": "src/"
         }
+    },
+    "autoload-dev": {
+        "psr-0": { "EasyForms\\": "tests/" }
     },
     "config": {
         "bin-dir": "bin/"

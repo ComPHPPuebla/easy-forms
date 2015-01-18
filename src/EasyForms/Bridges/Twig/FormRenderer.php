@@ -8,6 +8,7 @@
  */
 namespace EasyForms\Bridges\Twig;
 
+use EasyForms\Bridges\Twig\Exception\BlockNotFoundException;
 use EasyForms\View\ElementView;
 use EasyForms\View\FormView;
 use Twig_Environment as Environment;
@@ -18,32 +19,93 @@ class FormRenderer
     /** @var Environment */
     protected $environment;
 
-    /** @var string */
-    protected $themePath;
+    /** @var string[] */
+    protected $paths;
 
-    /** @var \Twig_Template  */
-    protected $theme;
+    /** @var Template[] */
+    protected $themes = [];
+
+    /** @var Template[] */
+    protected $cache = [];
 
     /**
      * @param Environment $environment
-     * @param string $themePath
+     * @param array $themePaths
      */
-    public function __construct(Environment $environment, $themePath)
+    public function __construct(Environment $environment, array $themePaths)
     {
         $this->environment = $environment;
-        $this->themePath = $themePath;
+        $this->paths = $themePaths;
     }
 
     /**
-     * @return \Twig_TemplateInterface
+     * @param Template $theme
      */
-    protected function theme()
+    public function addTheme(Template $theme)
     {
-        if (!$this->theme instanceof Template) {
-            $this->theme = $this->environment->loadTemplate($this->themePath);
+        $this->themes[] = $theme;
+    }
+
+    /**
+     * @param string $block
+     * @return Template
+     * @throws BlockNotFoundException
+     */
+    protected function searchThemeFor($block)
+    {
+        $this->loadThemes();
+
+        if (isset($this->cache[$block])) {
+            return $this->cache[$block];
         }
 
-        return $this->theme;
+        foreach ($this->themes as $theme) {
+            if ($theme = $this->tryToCache($theme, $block)) {
+                break; // Block is defined in this template
+            }
+        }
+
+        if (!$theme) {
+            throw new BlockNotFoundException("Block '$block' is not defined in the templates of this theme.");
+        }
+
+        return $theme;
+    }
+
+    /**
+     * @param Template $theme
+     * @param string $block
+     * @return Template | null
+     */
+    protected function tryToCache(Template $theme, $block)
+    {
+        if ($theme->hasBlock($block)) {
+            $this->cache[$block] = $theme;
+
+            return $theme;
+        }
+    }
+
+    /**
+     * Lazy load all the registered themes
+     */
+    protected function loadThemes()
+    {
+        foreach ($this->paths as $path) {
+            $this->loadThemeForPath($path);
+        }
+    }
+
+    /**
+     * @param string $path
+     */
+    protected function loadThemeForPath($path)
+    {
+        if (!isset($this->themes[$path])) {
+            $template = $this->environment->loadTemplate($path);
+            $this->themes[$path] = $template;
+            $template->getParent([]) && $this->themes[$template->getParent([])->getTemplateName()] = $template->getParent([]);
+        }
     }
 
     /**
@@ -57,11 +119,9 @@ class FormRenderer
      */
     public function renderRow(ElementView $element, array $options = [])
     {
-        $attr = isset($options['attr']) ? array_merge($element->attributes, $options['attr']) : $element->attributes;
-        unset($options['attr']);
-
-        $opt = isset($options['options']) ? array_merge($element->options, $options['options']) : $element->options;
-        unset($options['options']);
+        $attr = $this->mergeAttributes($element, $options);
+        isset($options['options']) && $this->overrideBlocks($element, $options['options']);
+        $opt = $this->mergeOptions($element, $options);
 
         return $this->renderBlock($element->rowBlock, array_merge([
             'element' => $element,
@@ -73,12 +133,53 @@ class FormRenderer
 
     /**
      * @param ElementView $element
+     * @param array $options
+     * @return array
+     */
+    protected function mergeAttributes(ElementView $element, array &$options)
+    {
+        $attr = isset($options['attr']) ? array_merge($element->attributes, $options['attr']) : $element->attributes;
+        unset($options['attr']);
+
+        return $attr;
+    }
+
+    /**
+     * @param ElementView $element
+     * @param array $options
+     * @return array
+     */
+    protected function mergeOptions(ElementView $element, array &$options)
+    {
+        $opt = isset($options['options']) ? array_merge($element->options, $options['options']) : $element->options;
+        unset($options['options']);
+
+        return $opt;
+    }
+
+    /**
+     * @param ElementView $element
+     * @param array $options
+     */
+    public function overrideBlocks(ElementView $element, array &$options)
+    {
+        isset($options['block']) && $element->block = $options['block'];
+        unset($options['block']);
+
+        isset($options['row_block']) && $element->rowBlock = $options['row_block'];
+        unset($options['row_block']);
+    }
+
+    /**
+     * @param ElementView $element
      * @param array $attributes
      * @param array $options
      * @return string
      */
     public function renderElement(ElementView $element, $attributes = [], array $options = [])
     {
+        $this->overrideBlocks($element, $options);
+
         return $this->renderBlock($element->block, [
             'element' => $element,
             'attr' => array_merge($element->attributes, $attributes),
@@ -144,9 +245,11 @@ class FormRenderer
      */
     protected function renderBlock($name, array $vars = [])
     {
+        $theme = $this->searchThemeFor($name);
+
         ob_start();
 
-        $this->theme()->displayBlock($name, $vars);
+        $theme->displayBlock($name, $vars);
 
         return ob_get_clean();
     }

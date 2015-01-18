@@ -15,6 +15,7 @@ use EasyForms\Elements\Select;
 use EasyForms\Elements\Text;
 use EasyForms\Form;
 use PhpSpec\ObjectBehavior;
+use Prophecy\Argument;
 use Twig_Environment as Environment;
 use Twig_Template as Template;
 
@@ -22,31 +23,39 @@ class FormRendererSpec extends ObjectBehavior
 {
     function let(Environment $environment, Template $template)
     {
-        $this->beConstructedWith($environment, 'bootstrap3.html.twig');
+        $this->beConstructedWith($environment, ['bootstrap3.html.twig']);
         $environment->loadTemplate('bootstrap3.html.twig')->willReturn($template);
     }
 
     function it_should_render_an_element(Template $template)
     {
+        $htmlAttributes = [
+            'class' => 'js-highlighted'
+        ];
+
         $username = new Text('username');
         $username->setValue('john.doe');
         $usernameView = $username->buildView();
 
-        $this->renderElement($usernameView, $htmlAttributes = [
-            'class' => 'js-highlighted'
-        ]);
-
+        $template->hasBlock($usernameView->block)->willReturn(true);
+        $template->getParent([])->shouldBeCalled();
         $template->displayBlock($usernameView->block, [
             'element' => $usernameView,
             'attr' => $usernameView->attributes + $htmlAttributes,
             'value' => $usernameView->value,
             'options' => [],
             'choices' => [],
-        ])->shouldHaveBeenCalled();
+        ])->shouldBeCalled();
+
+        $this->renderElement($usernameView, $htmlAttributes);
     }
 
     function it_should_render_an_element_with_choices(Template $template)
     {
+        $htmlAttributes = [
+            'class' => 'js-highlighted'
+        ];
+
         $languages = new Select('languages');
         $languages->setChoices([
             'PHP' => 'PHP',
@@ -57,17 +66,17 @@ class FormRendererSpec extends ObjectBehavior
         $languages->setValue('PHP');
         $languagesView = $languages->buildView();
 
-        $this->renderElement($languagesView, $htmlAttributes = [
-            'class' => 'js-highlighted'
-        ]);
-
+        $template->hasBlock($languagesView->block)->willReturn(true);
+        $template->getParent([])->shouldBeCalled();
         $template->displayBlock($languagesView->block, [
             'element' => $languagesView,
             'attr' => $languagesView->attributes + $htmlAttributes,
             'value' => $languagesView->value,
             'options' => [],
             'choices' => $languagesView->choices,
-        ])->shouldHaveBeenCalled();
+        ])->shouldBeCalled();
+
+        $this->renderElement($languagesView, $htmlAttributes);
     }
 
     function it_should_render_an_element_with_options(Template $template)
@@ -78,15 +87,17 @@ class FormRendererSpec extends ObjectBehavior
         $captchaOptions = ['image_attr' => ['id' => 'js-captcha']];
         $captchaView = $captcha->buildView();
 
-        $this->renderElement($captchaView, $htmlAttributes, $captchaOptions);
-
+        $template->hasBlock($captchaView->block)->willReturn(true);
+        $template->getParent([])->shouldBeCalled();
         $template->displayBlock($captchaView->block, [
             'element' => $captchaView,
             'attr' => $captchaView->attributes + $htmlAttributes,
             'value' => $captchaView->value,
             'options' => $captchaView->options + $captchaOptions,
             'choices' => [],
-        ])->shouldHaveBeenCalled();
+        ])->shouldBeCalled();
+
+        $this->renderElement($captchaView, $htmlAttributes, $captchaOptions);
     }
 
     function it_should_render_a_form_row(Template $template)
@@ -107,8 +118,8 @@ class FormRendererSpec extends ObjectBehavior
         ];
         $usernameView = $username->buildView();
 
-        $this->renderRow($usernameView, $options);
-
+        $template->hasBlock(Argument::any())->willReturn(true);
+        $template->getParent([])->shouldBeCalled();
         $template->displayBlock($usernameView->rowBlock, [
             'element' => $usernameView,
             'valid' => $usernameView->valid,
@@ -116,7 +127,9 @@ class FormRendererSpec extends ObjectBehavior
             'options' => [],
             'label' => $options['label'],
             'label_attr' => $options['label_attr'],
-        ])->shouldHaveBeenCalled();
+        ])->shouldBeCalled();
+
+        $this->renderRow($usernameView, $options);
     }
 
     function it_should_render_an_element_errors(Template $template)
@@ -125,13 +138,15 @@ class FormRendererSpec extends ObjectBehavior
         $username->setMessages([
             'User "john.doe" does not exist.'
         ]);
-
         $usernameView = $username->buildView();
-        $this->renderErrors($usernameView);
 
+        $template->hasBlock('errors')->willReturn(true);
+        $template->getParent([])->shouldBeCalled();
         $template->displayBlock('errors', [
             'errors' => $usernameView->messages,
-        ])->shouldHaveBeenCalled();
+        ])->shouldBeCalled();
+
+        $this->renderErrors($usernameView);
     }
 
     function it_should_render_an_element_label(Template $template)
@@ -139,15 +154,17 @@ class FormRendererSpec extends ObjectBehavior
         $username = new Text('username');
         $labelAttributes = ['class' => 'js-label'];
         $elementId = 'username';
-
         $usernameView = $username->buildView();
-        $this->renderLabel($usernameView, 'Username', $elementId, $labelAttributes);
 
+        $template->hasBlock('label')->willReturn(true);
+        $template->getParent([])->shouldBeCalled();
         $template->displayBlock('label', [
             'label' => 'Username',
             'attr' => $labelAttributes + ['for' => $elementId],
             'is_required' => $usernameView->isRequired,
-        ])->shouldHaveBeenCalled();
+        ])->shouldBeCalled();
+
+        $this->renderLabel($usernameView, 'Username', $elementId, $labelAttributes);
     }
 
     function it_should_render_the_opening_tag_of_a_form(Template $template)
@@ -157,11 +174,13 @@ class FormRendererSpec extends ObjectBehavior
         $formAttributes = ['name' => 'login'];
         $formView = $form->buildView();
 
-        $this->renderFormStart($formView, $formAttributes);
-
+        $template->hasBlock('form_start')->willReturn(true);
+        $template->getParent([])->shouldBeCalled();
         $template->displayBlock('form_start', [
             'attr' => $formView->attributes + $formAttributes,
-        ])->shouldHaveBeenCalled();
+        ])->shouldBeCalled();
+
+        $this->renderFormStart($formView, $formAttributes);
     }
 
     function it_should_render_the_opening_tag_of_a_multipart_form(Template $template)
@@ -170,18 +189,24 @@ class FormRendererSpec extends ObjectBehavior
         $form->add(new File('avatar'));
         $formView = $form->buildView();
 
-        $this->renderFormStart($formView);
-
+        $template->hasBlock('form_start')->willReturn(true);
+        $template->getParent([])->shouldBeCalled();
         $template->displayBlock('form_start', [
             'attr' => $formView->attributes + ['enctype' => 'multipart/form-data'],
-        ])->shouldHaveBeenCalled();
+        ])->shouldBeCalled();
+
+        $this->renderFormStart($formView);
+
+
     }
 
     function it_should_render_the_closing_tag_of_a_form(Template $template)
     {
-        $this->renderFormEnd();
+        $template->hasBlock('form_end')->willReturn(true);
+        $template->getParent([])->shouldBeCalled();
+        $template->displayBlock('form_end', [])->shouldBeCalled();
 
-        $template->displayBlock('form_end', [])->shouldHaveBeenCalled();
+        $this->renderFormEnd();
     }
 }
 

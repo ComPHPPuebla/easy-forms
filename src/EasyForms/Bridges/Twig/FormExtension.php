@@ -8,6 +8,7 @@
  */
 namespace EasyForms\Bridges\Twig;
 
+use EasyForms\Bridges\Twig\TokenParser\AddThemeTokenParser;
 use Twig_Extension as Extension;
 use Twig_SimpleFunction as SimpleFunction;
 
@@ -22,6 +23,14 @@ class FormExtension extends Extension
     public function __construct(FormRenderer $renderer)
     {
         $this->renderer = $renderer;
+    }
+
+    /**
+     * @return FormRenderer
+     */
+    public function renderer()
+    {
+        return $this->renderer;
     }
 
     /**
@@ -40,12 +49,22 @@ class FormExtension extends Extension
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function getTokenParsers()
+    {
+        return [
+            new AddThemeTokenParser(),
+        ];
+    }
+
+    /**
      * Returns the name of the extension.
      *
      * @return string The extension name
      */
     public function getName()
     {
-        return 'twig_forms';
+        return 'easy_forms';
     }
 }

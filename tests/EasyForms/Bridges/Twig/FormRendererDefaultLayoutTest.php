@@ -17,13 +17,10 @@ use EasyForms\Elements\Text;
 use EasyForms\Elements\TextArea;
 use EasyForms\Form;
 use PHPUnit_Framework_TestCase as TestCase;
-use Twig_Environment as Environment;
-use Twig_Loader_Filesystem as Loader;
 
 class FormRendererDefaultLayoutTest extends TestCase
 {
-    /** @var FormRenderer */
-    protected $renderer;
+    use ProvidesLayoutConfiguration;
 
     public function setUp()
     {
@@ -229,23 +226,5 @@ class FormRendererDefaultLayoutTest extends TestCase
             '<div><label class="form-label">Gender</label><label><input type="radio" name="gender" class="js-validate" value="M" checked>Male</label><label><input type="radio" name="gender" class="js-validate" value="F">Female</label><ul><li>This is not a valid value</li></ul></div>',
             $html
         );
-    }
-
-    /**
-     * @param string $path Relative path to layout file
-     */
-    protected function configureLayout($path)
-    {
-        $loader = new Loader([
-            str_replace('tests', 'src', __DIR__)
-        ]);
-        $environment = new Environment($loader, [
-            'debug' => true,
-            'strict_variables' => true,
-        ]);
-
-        $this->renderer = new FormRenderer($environment, $path);
-
-        $environment->addExtension(new FormExtension($this->renderer));
     }
 }

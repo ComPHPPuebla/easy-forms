@@ -1,0 +1,14 @@
+{% extends 'forms/base.html.twig' %}
+
+{% form_theme _self %}
+
+{%- block money -%}
+    <div class="input-group"><div class="input-group-addon">$</div>
+        {%- set options = options|merge({'block': 'input'}) -%}
+        {{- element(element, attr, options) -}}
+    <div class="input-group-addon">.00</div></div>
+{%- endblock money -%}
+
+{% block content -%}
+    {{ element_row(price, {'label': 'Price', 'attr': {'id': 'price'}, 'options': {'block': 'money'}}) }}
+{%- endblock %}

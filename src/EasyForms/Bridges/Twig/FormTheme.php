@@ -42,8 +42,9 @@ class FormTheme
     {
         $this->templates[$template->getTemplateName()] = $template;
 
+        /** @var Template $parent */
         if ($parent = $template->getParent([])) {
-            $this->templates[$parent->getTemplateName()] = $parent;
+            $this->addTemplate($parent);
         }
     }
 

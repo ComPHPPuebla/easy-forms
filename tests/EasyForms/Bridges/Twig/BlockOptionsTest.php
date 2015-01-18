@@ -4,7 +4,7 @@
  *
  * This source file is subject to the license that is bundled with this package in the file LICENSE.
  *
- * @copyright  Mandrágora Web-Based Systems 2015 (http://www.mandragora-web-systems.com)
+ * @copyright Comunidad PHP Puebla 2015 (http://www.comunidadphppuebla.com)
  */
 namespace EasyForms\Bridges\Twig;
 

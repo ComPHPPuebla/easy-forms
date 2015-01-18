@@ -8,6 +8,7 @@
  */
 namespace spec\EasyForms\Bridges\Twig;
 
+use EasyForms\Bridges\Twig\BlockOptions;
 use EasyForms\Bridges\Twig\FormTheme;
 use EasyForms\Elements\Captcha\CaptchaAdapter;
 use EasyForms\Elements\Captcha;
@@ -21,9 +22,9 @@ use Twig_Template as Template;
 
 class FormRendererSpec extends ObjectBehavior
 {
-    function let(FormTheme $theme)
+    function let(FormTheme $theme, BlockOptions $blockOptions)
     {
-        $this->beConstructedWith($theme);
+        $this->beConstructedWith($theme, $blockOptions);
     }
 
     function it_should_render_an_element(FormTheme $theme, Template $template)
@@ -94,7 +95,7 @@ class FormRendererSpec extends ObjectBehavior
         ])->shouldHaveBeenCalled();
     }
 
-    function it_should_render_a_form_row(FormTheme $theme, Template $template)
+    function it_should_render_a_form_row(BlockOptions $blockOptions, FormTheme $theme, Template $template)
     {
         $username = new Text('username');
         $username->setValue('john.doe');
@@ -111,18 +112,20 @@ class FormRendererSpec extends ObjectBehavior
             ],
         ];
         $usernameView = $username->buildView();
-        $theme->loadTemplateFor($usernameView->rowBlock)->willReturn($template);
-
-        $this->renderRow($usernameView, $options);
-
-        $template->displayBlock($usernameView->rowBlock, [
+        $processedOptions = [
             'element' => $usernameView,
             'valid' => $usernameView->valid,
             'attr' => $usernameView->attributes + $options['attr'],
             'options' => [],
             'label' => $options['label'],
             'label_attr' => $options['label_attr'],
-        ])->shouldHaveBeenCalled();
+        ];
+        $theme->loadTemplateFor($usernameView->rowBlock)->willReturn($template);
+        $blockOptions->process($usernameView, $options)->willReturn($processedOptions);
+
+        $this->renderRow($usernameView, $options);
+
+        $template->displayBlock($usernameView->rowBlock, $processedOptions)->shouldHaveBeenCalled();
     }
 
     function it_should_render_an_element_errors(FormTheme $theme, Template $template)

@@ -17,12 +17,17 @@ class FormRenderer
     /** @var Theme */
     protected $theme;
 
+    /** @var BlockOptions */
+    protected $options;
+
     /**
      * @param FormTheme $theme
+     * @param BlockOptions $options
      */
-    public function __construct(FormTheme $theme)
+    public function __construct(FormTheme $theme, BlockOptions $options)
     {
         $this->theme = $theme;
+        $this->options = $options;
     }
 
     /**
@@ -44,55 +49,7 @@ class FormRenderer
      */
     public function renderRow(ElementView $element, array $options = [])
     {
-        $attr = $this->mergeAttributes($element, $options);
-        isset($options['options']) && $this->overrideBlocks($element, $options['options']);
-        $opt = $this->mergeOptions($element, $options);
-
-        return $this->renderBlock($element->rowBlock, array_merge([
-            'element' => $element,
-            'valid' => $element->valid,
-            'attr' => $attr,
-            'options' => $opt,
-        ], $options));
-    }
-
-    /**
-     * @param ElementView $element
-     * @param array $options
-     * @return array
-     */
-    protected function mergeAttributes(ElementView $element, array &$options)
-    {
-        $attr = isset($options['attr']) ? array_merge($element->attributes, $options['attr']) : $element->attributes;
-        unset($options['attr']);
-
-        return $attr;
-    }
-
-    /**
-     * @param ElementView $element
-     * @param array $options
-     * @return array
-     */
-    protected function mergeOptions(ElementView $element, array &$options)
-    {
-        $opt = isset($options['options']) ? array_merge($element->options, $options['options']) : $element->options;
-        unset($options['options']);
-
-        return $opt;
-    }
-
-    /**
-     * @param ElementView $element
-     * @param array $options
-     */
-    public function overrideBlocks(ElementView $element, array &$options)
-    {
-        isset($options['block']) && $element->block = $options['block'];
-        unset($options['block']);
-
-        isset($options['row_block']) && $element->rowBlock = $options['row_block'];
-        unset($options['row_block']);
+        return $this->renderBlock($element->rowBlock, $this->options->process($element, $options));
     }
 
     /**
@@ -103,7 +60,7 @@ class FormRenderer
      */
     public function renderElement(ElementView $element, $attributes = [], array $options = [])
     {
-        $this->overrideBlocks($element, $options);
+        $this->options->overrideBlocks($element, $options);
 
         return $this->renderBlock($element->block, [
             'element' => $element,

@@ -32,7 +32,7 @@ trait ProvidesLayoutConfiguration
             'strict_variables' => true,
         ]);
 
-        $this->renderer = new FormRenderer(new FormTheme($this->environment, [$path]));
+        $this->renderer = new FormRenderer(new FormTheme($this->environment, [$path]), new BlockOptions());
 
         $this->environment->addExtension(new FormExtension($this->renderer));
     }

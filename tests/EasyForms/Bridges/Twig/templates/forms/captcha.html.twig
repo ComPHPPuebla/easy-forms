@@ -1,0 +1,15 @@
+{% extends 'forms/base.html.twig' %}
+
+{% form_theme [_self, 'layouts/captcha-default.html.twig'] %}
+
+{%- block money -%}
+    <div class="input-group"><div class="input-group-addon">$</div>
+        {%- set options = options|merge({'block': 'input'}) -%}
+        {{- block('input') -}}
+        <div class="input-group-addon">.00</div></div>
+{%- endblock money -%}
+
+{% block content -%}
+    {{ element_row(price, {'label': 'Price', 'attr': {'id': 'price'}, 'options': {'block': 'money'}}) -}}
+    {{- element_row(captcha, {'label': 'Please type this word below'}) }}
+{%- endblock %}

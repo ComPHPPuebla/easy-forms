@@ -26,11 +26,7 @@ class AddThemeTokenParser extends TokenParser
         $lineNumber = $token->getLine();
         $stream = $this->parser->getStream();
 
-        $templates = new ArrayExpression([], $stream->getCurrent()->getLine());
-        do {
-            $templates->addElement($this->parser->getExpressionParser()->parseExpression());
-        } while (!$stream->test(Token::BLOCK_END_TYPE));
-
+        $templates = $this->parser->getExpressionParser()->parseExpression();
 
         $stream->expect(Token::BLOCK_END_TYPE);
 

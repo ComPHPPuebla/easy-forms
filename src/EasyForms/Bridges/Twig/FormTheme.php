@@ -8,6 +8,7 @@
  */
 namespace EasyForms\Bridges\Twig;
 
+use EasyForms\Bridges\Twig\Exception\BlockNotFoundException;
 use Twig_Template as Template;
 use Twig_Environment as Environment;
 
@@ -46,6 +47,28 @@ class FormTheme
         if ($parent = $template->getParent([])) {
             $this->addTemplate($parent);
         }
+    }
+
+    /**
+     * @param string $path
+     * @return Template
+     */
+    public function loadTemplate($path)
+    {
+        return $this->environment->loadTemplate($path);
+    }
+
+    /**
+     * @return array
+     */
+    public function blocks()
+    {
+        $blocks = [];
+        foreach ($this->templates as $template) {
+            $blocks += $template->getBlocks();
+        }
+
+        return $blocks;
     }
 
     /**
@@ -104,9 +127,7 @@ class FormTheme
     protected function loadTemplateForPath($path)
     {
         if (!isset($this->templates[$path])) {
-            /** @var Template $template */
-            $template = $this->environment->loadTemplate($path);
-            $this->addTemplate($template);
+            $this->addTemplate($this->loadTemplate($path));
         }
     }
 }

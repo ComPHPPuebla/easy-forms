@@ -36,6 +36,7 @@ class FormRendererSpec extends ObjectBehavior
         $username->setValue('john.doe');
         $usernameView = $username->buildView();
         $theme->loadTemplateFor($usernameView->block)->willReturn($template);
+        $theme->blocks()->willReturn([]);
 
         $this->renderElement($usernameView, $htmlAttributes);
 
@@ -45,7 +46,7 @@ class FormRendererSpec extends ObjectBehavior
             'value' => $usernameView->value,
             'options' => [],
             'choices' => [],
-        ])->shouldHaveBeenCalled();
+        ], [])->shouldHaveBeenCalled();
     }
 
     function it_should_render_an_element_with_choices(FormTheme $theme, Template $template)
@@ -63,6 +64,7 @@ class FormRendererSpec extends ObjectBehavior
         $languages->setValue('PHP');
         $languagesView = $languages->buildView();
         $theme->loadTemplateFor($languagesView->block)->willReturn($template);
+        $theme->blocks()->willReturn([]);
 
         $this->renderElement($languagesView, $htmlAttributes);
 
@@ -72,7 +74,7 @@ class FormRendererSpec extends ObjectBehavior
             'value' => $languagesView->value,
             'options' => [],
             'choices' => $languagesView->choices,
-        ])->shouldHaveBeenCalled();
+        ], [])->shouldHaveBeenCalled();
     }
 
     function it_should_render_an_element_with_options(FormTheme $theme, Template $template)
@@ -83,6 +85,7 @@ class FormRendererSpec extends ObjectBehavior
         $captchaOptions = ['image_attr' => ['id' => 'js-captcha']];
         $captchaView = $captcha->buildView();
         $theme->loadTemplateFor($captchaView->block)->willReturn($template);
+        $theme->blocks()->willReturn([]);
 
         $this->renderElement($captchaView, $htmlAttributes, $captchaOptions);
 
@@ -92,7 +95,7 @@ class FormRendererSpec extends ObjectBehavior
             'value' => $captchaView->value,
             'options' => $captchaView->options + $captchaOptions,
             'choices' => [],
-        ])->shouldHaveBeenCalled();
+        ], [])->shouldHaveBeenCalled();
     }
 
     function it_should_render_a_form_row(BlockOptions $blockOptions, FormTheme $theme, Template $template)
@@ -121,11 +124,12 @@ class FormRendererSpec extends ObjectBehavior
             'label_attr' => $options['label_attr'],
         ];
         $theme->loadTemplateFor($usernameView->rowBlock)->willReturn($template);
+        $theme->blocks()->willReturn([]);
         $blockOptions->process($usernameView, $options)->willReturn($processedOptions);
 
         $this->renderRow($usernameView, $options);
 
-        $template->displayBlock($usernameView->rowBlock, $processedOptions)->shouldHaveBeenCalled();
+        $template->displayBlock($usernameView->rowBlock, $processedOptions, [])->shouldHaveBeenCalled();
     }
 
     function it_should_render_an_element_errors(FormTheme $theme, Template $template)
@@ -136,12 +140,13 @@ class FormRendererSpec extends ObjectBehavior
         ]);
         $usernameView = $username->buildView();
         $theme->loadTemplateFor('errors')->willReturn($template);
+        $theme->blocks()->willReturn([]);
 
         $this->renderErrors($usernameView);
 
         $template->displayBlock('errors', [
             'errors' => $usernameView->messages,
-        ])->shouldHaveBeenCalled();
+        ], [])->shouldHaveBeenCalled();
     }
 
     function it_should_render_an_element_label(FormTheme $theme, Template $template)
@@ -151,6 +156,7 @@ class FormRendererSpec extends ObjectBehavior
         $elementId = 'username';
         $usernameView = $username->buildView();
         $theme->loadTemplateFor('label')->willReturn($template);
+        $theme->blocks()->willReturn([]);
 
         $this->renderLabel($usernameView, 'Username', $elementId, $labelAttributes);
 
@@ -158,7 +164,7 @@ class FormRendererSpec extends ObjectBehavior
             'label' => 'Username',
             'attr' => $labelAttributes + ['for' => $elementId],
             'is_required' => $usernameView->isRequired,
-        ])->shouldHaveBeenCalled();
+        ], [])->shouldHaveBeenCalled();
     }
 
     function it_should_render_the_opening_tag_of_a_form(FormTheme $theme, Template $template)
@@ -168,12 +174,13 @@ class FormRendererSpec extends ObjectBehavior
         $formAttributes = ['name' => 'login'];
         $formView = $form->buildView();
         $theme->loadTemplateFor('form_start')->willReturn($template);
+        $theme->blocks()->willReturn([]);
 
         $this->renderFormStart($formView, $formAttributes);
 
         $template->displayBlock('form_start', [
             'attr' => $formView->attributes + $formAttributes,
-        ])->shouldHaveBeenCalled();
+        ], [])->shouldHaveBeenCalled();
     }
 
     function it_should_render_the_opening_tag_of_a_multipart_form(FormTheme $theme, Template $template)
@@ -182,21 +189,23 @@ class FormRendererSpec extends ObjectBehavior
         $form->add(new File('avatar'));
         $formView = $form->buildView();
         $theme->loadTemplateFor('form_start')->willReturn($template);
+        $theme->blocks()->willReturn([]);
 
         $this->renderFormStart($formView);
 
         $template->displayBlock('form_start', [
             'attr' => $formView->attributes + ['enctype' => 'multipart/form-data'],
-        ])->shouldHaveBeenCalled();
+        ], [])->shouldHaveBeenCalled();
     }
 
     function it_should_render_the_closing_tag_of_a_form(FormTheme $theme, Template $template)
     {
         $theme->loadTemplateFor('form_end')->willReturn($template);
+        $theme->blocks()->willReturn([]);
 
         $this->renderFormEnd();
 
-        $template->displayBlock('form_end', [])->shouldHaveBeenCalled();
+        $template->displayBlock('form_end', [], [])->shouldHaveBeenCalled();
     }
 }
 

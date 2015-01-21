@@ -36,6 +36,7 @@ class FormRenderer
     public function addTemplates(array $templates)
     {
         foreach ($templates as $template) {
+            !$template instanceof Template && $template = $this->theme->loadTemplate($template);
             $this->theme->addTemplate($template);
         }
     }
@@ -133,7 +134,7 @@ class FormRenderer
 
         ob_start();
 
-        $template->displayBlock($name, $vars);
+        $template->displayBlock($name, $vars, $this->theme->blocks());
 
         return ob_get_clean();
     }

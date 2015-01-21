@@ -17,8 +17,8 @@ class FormTheme
     /** @var Environment */
     protected $environment;
 
-    /** @var string[] */
-    protected $paths;
+    /** @var string */
+    protected $path;
 
     /** @var Template[] */
     protected $templates = [];
@@ -26,14 +26,17 @@ class FormTheme
     /** @var Template[] */
     protected $cache = [];
 
+    /** @var  array */
+    protected $blocks = [];
+
     /**
      * @param Environment $environment
-     * @param array $themePaths
+     * @param string $themePath
      */
-    public function __construct(Environment $environment, array $themePaths)
+    public function __construct(Environment $environment, $themePath)
     {
         $this->environment = $environment;
-        $this->paths = $themePaths;
+        $this->path = $themePath;
     }
 
     /**
@@ -63,12 +66,13 @@ class FormTheme
      */
     public function blocks()
     {
-        $blocks = [];
-        foreach ($this->templates as $template) {
-            $blocks += $template->getBlocks();
+        if (!$this->blocks) {
+            foreach ($this->templates as $template) {
+                $this->blocks += $template->getBlocks();
+            }
         }
 
-        return $blocks;
+        return $this->blocks;
     }
 
     /**
@@ -78,7 +82,7 @@ class FormTheme
      */
     public function loadTemplateFor($block)
     {
-        $this->loadTemplates();
+        $this->initTemplate();
 
         if (isset($this->cache[$block])) {
             return $this->cache[$block];
@@ -112,22 +116,12 @@ class FormTheme
     }
 
     /**
-     * Lazy load all the registered templates
+     * Lazy load the main template
      */
-    protected function loadTemplates()
+    protected function initTemplate()
     {
-        foreach ($this->paths as $path) {
-            $this->loadTemplateForPath($path);
-        }
-    }
-
-    /**
-     * @param string $path
-     */
-    protected function loadTemplateForPath($path)
-    {
-        if (!isset($this->templates[$path])) {
-            $this->addTemplate($this->loadTemplate($path));
+        if (!isset($this->templates[$this->path])) {
+            $this->addTemplate($this->loadTemplate($this->path));
         }
     }
 }

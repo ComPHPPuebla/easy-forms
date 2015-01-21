@@ -31,11 +31,13 @@ class FormRenderer
     }
 
     /**
-     * @param Template $template
+     * @param Template[] $templates
      */
-    public function addTemplate(Template $template)
+    public function addTemplates(array $templates)
     {
-        $this->theme->addTemplate($template);
+        foreach ($templates as $template) {
+            $this->theme->addTemplate($template);
+        }
     }
 
     /**

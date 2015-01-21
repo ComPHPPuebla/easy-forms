@@ -14,7 +14,19 @@ use Twig_Compiler as Compiler;
 class FormThemeNode extends Node
 {
     /**
+     * @param Node $templates
+     * @param integer $lineNumber
+     * @param string $tag
+     */
+    public function __construct(Node $templates, $lineNumber, $tag = null)
+    {
+        parent::__construct(['templates' => $templates], [], $lineNumber, $tag);
+    }
+
+    /**
      * Compiles the node to PHP.
+     *
+     * Adds the templates to the current form's theme
      *
      * @param Compiler $compiler A Twig_Compiler instance
      */
@@ -22,8 +34,8 @@ class FormThemeNode extends Node
     {
         $compiler
             ->addDebugInfo($this)
-            ->write('$this->env->getExtension(\'easy_forms\')->renderer()->addTemplate(')
-            ->subcompile($this->getNode('theme'))
+            ->write('$this->env->getExtension(\'easy_forms\')->renderer()->addTemplates(')
+            ->subcompile($this->getNode('templates'))
             ->raw(");\n");
     }
 }

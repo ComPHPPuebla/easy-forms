@@ -9,6 +9,7 @@
 namespace EasyForms\Bridges\Twig\TokenParser;
 
 use EasyForms\Bridges\Twig\Node\FormThemeNode;
+use Twig_Node_Expression_Array as ArrayExpression;
 use Twig_TokenParser as TokenParser;
 use Twig_Token as Token;
 
@@ -24,10 +25,16 @@ class AddThemeTokenParser extends TokenParser
     {
         $lineNumber = $token->getLine();
         $stream = $this->parser->getStream();
-        $theme = $this->parser->getExpressionParser()->parseExpression();
+
+        $templates = new ArrayExpression([], $stream->getCurrent()->getLine());
+        do {
+            $templates->addElement($this->parser->getExpressionParser()->parseExpression());
+        } while (!$stream->test(Token::BLOCK_END_TYPE));
+
+
         $stream->expect(Token::BLOCK_END_TYPE);
 
-        return new FormThemeNode(['theme' => $theme], [], $lineNumber, $this->getTag());
+        return new FormThemeNode($templates, $lineNumber, $this->getTag());
     }
 
     /**

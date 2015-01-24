@@ -20,7 +20,7 @@ class SelectView extends ChoiceView
     public function isSelected($value)
     {
         if ($this->isMultiple) {
-            return in_array($value, $this->value);
+            return in_array($value, is_array($this->value) ? $this->value : []);
         }
 
         return $this->value === $value;

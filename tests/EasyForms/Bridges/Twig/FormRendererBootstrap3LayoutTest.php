@@ -127,7 +127,7 @@ class FormRendererBootstrap3LayoutTest extends TestCase
         ]);
 
         $this->assertEquals(
-            '<div class="checkbox"><label class="form-label"><input type="checkbox" name="remember_me" value="remember" checked class="js-validate">Remember me</label></div>',
+            '<div><label class="form-label checkbox-inline"><input type="checkbox" name="remember_me" value="remember" checked class="js-validate">Remember me</label></div>',
             $html
         );
     }

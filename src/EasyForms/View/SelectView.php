@@ -12,4 +12,17 @@ class SelectView extends ChoiceView
 {
     /** @var boolean */
     public $isMultiple;
+
+    /**
+     * @param string $value
+     * @return bool
+     */
+    public function isSelected($value)
+    {
+        if ($this->isMultiple) {
+            return in_array($value, $this->value);
+        }
+
+        return $this->value === $value;
+    }
 }

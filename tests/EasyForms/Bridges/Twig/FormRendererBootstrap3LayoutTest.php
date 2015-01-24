@@ -68,6 +68,20 @@ class FormRendererBootstrap3LayoutTest extends TestCase
     }
 
     /** @test */
+    public function it_should_render_a_multiple_select_element()
+    {
+        $categories = new Select('categories', [100 => 'Electronics', 200 => 'Video games']);
+        $categories->enableMultipleSelection();
+        $categories->setValue([100, 200]);
+
+        $html = $this->renderer->renderElement($categories->buildView(), ['class' => 'js-chained']);
+        $this->assertEquals(
+            '<select name="categories[]" multiple class="js-chained form-control" multiple><option value="100" selected>Electronics</option><option value="200" selected>Video games</option></select>',
+            $html
+        );
+    }
+
+    /** @test */
     public function it_should_render_a_radio_button_element()
     {
         $gender = new Radio('gender', ['M' => 'Male', 'F' => 'Female']);

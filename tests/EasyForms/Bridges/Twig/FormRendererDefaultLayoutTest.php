@@ -155,6 +155,20 @@ class FormRendererDefaultLayoutTest extends TestCase
     }
 
     /** @test */
+    public function it_should_render_a_multiple_select_element()
+    {
+        $categories = new Select('categories', [100 => 'Electronics', 200 => 'Video games']);
+        $categories->enableMultipleSelection();
+        $categories->setValue([100, 200]);
+
+        $html = $this->renderer->renderElement($categories->buildView(), ['class' => 'js-chained']);
+        $this->assertEquals(
+            '<select name="categories[]" multiple class="js-chained" multiple><option value="100" selected>Electronics</option><option value="200" selected>Video games</option></select>',
+            $html
+        );
+    }
+
+    /** @test */
     public function it_should_render_an_element_row()
     {
         $description = new TextArea('description');

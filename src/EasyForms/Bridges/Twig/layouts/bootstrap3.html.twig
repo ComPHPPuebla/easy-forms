@@ -35,20 +35,6 @@
     <input{{ block('attributes') }}>
 {%- endblock input %}
 
-{% block captcha_image -%}
-    {% set image_attr = options.image_attr|default([])|merge({
-        'class': (attr.class|default('') ~ ' img-responsive img-thumbnail center-block')|trim,
-        'alt': '',
-        'src': options.image_url ~ '/' ~ options.captcha_id ~ '.png'
-    }) -%}
-    <img{% for attrname, attrvalue in image_attr %} {{ attrname }}="{{ attrvalue }}"{% endfor %}><br>
-    {% set name = attr.name -%}
-    {% set attr = attr|merge({type: 'text', name: name ~ '[input]', class: (attr.class|default('') ~ ' form-control')|trim}) -%}
-    <input{{ block('attributes') }}>
-    {% set attr = attr|merge({type: 'hidden', value: options.captcha_id, name: name ~ '[id]'}) -%}
-    <input{{ block('attributes') }}>
-{%- endblock captcha_image %}
-
 {% block radio -%}
     {%- for value, label in choices -%}
         {% set attr = attr|merge({'value': value}) -%}
@@ -58,6 +44,7 @@
 
 {% block select -%}
     {% set attr = attr|merge({class: (attr.class|default('') ~ ' form-control')|trim}) -%}
+    {%- if element.isMultiple -%}{% set attr = attr|merge({'name': attr.name ~ '[]'}) %}{%- endif -%}
     <select{{ block('attributes') }}{% if element.isMultiple %} multiple{% endif %}>
         {{- block('select_options') -}}
     </select>

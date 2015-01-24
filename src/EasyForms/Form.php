@@ -36,6 +36,15 @@ class Form
     }
 
     /**
+     * @param $name
+     * @return boolean
+     */
+    protected function has($name)
+    {
+        return isset($this->elements[$name]);
+    }
+
+    /**
      * @param Element $element
      * @return Form
      */
@@ -75,9 +84,18 @@ class Form
      */
     public function submit(array $values)
     {
-        foreach ($this->elements as $name => $element) {
-            $value = isset($values[$name]) ? $values[$name] : null;
-            $element->setValue($value);
+        $this->populate($values);
+    }
+
+    /**
+     * Populate the form elements with its corresponding value
+     *
+     * @param array $values
+     */
+    protected function populate(array $values)
+    {
+        foreach ($values as $name => $value) {
+            $this->has($name) && $this->get($name)->setValue($value);
         }
     }
 

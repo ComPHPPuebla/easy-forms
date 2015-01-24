@@ -12,10 +12,13 @@ use PhpSpec\ObjectBehavior;
 
 class CheckboxSpec extends ObjectBehavior
 {
+    function let()
+    {
+        $this->beConstructedWith('remember_me', 'remember');
+    }
+
     function it_should_have_checkbox_as_its_type_attribute()
     {
-        $this->beConstructedWith('remember_me');
-
         $view = $this->buildView();
 
         $view->attributes['type']->shouldBe('checkbox');
@@ -23,8 +26,6 @@ class CheckboxSpec extends ObjectBehavior
 
     function it_should_build_view_with_the_correct_checked_value()
     {
-        $this->beConstructedWith('remember_me');
-
         $this->setValue('remember');
         $view = $this->buildView();
 

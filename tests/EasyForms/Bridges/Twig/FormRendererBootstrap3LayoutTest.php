@@ -117,7 +117,7 @@ class FormRendererBootstrap3LayoutTest extends TestCase
     /** @test */
     public function it_should_render_a_row_with_a_checkbox_element()
     {
-        $rememberMe = new Checkbox('remember_me');
+        $rememberMe = new Checkbox('remember_me', 'remember');
         $rememberMe->setValue('remember');
 
         $html = $this->renderer->renderRow($rememberMe->buildView(), [

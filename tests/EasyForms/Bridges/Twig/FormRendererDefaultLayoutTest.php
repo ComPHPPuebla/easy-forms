@@ -120,11 +120,11 @@ class FormRendererDefaultLayoutTest extends TestCase
     /** @test */
     public function it_should_render_a_checkbox_element()
     {
-        $rememberMe = new Checkbox('remember_me');
+        $rememberMe = new Checkbox('remember_me', 'remember');
 
         $html = $this->renderer->renderElement($rememberMe->buildView(), ['class' => 'js-cookie']);
         $this->assertEquals(
-            '<input type="checkbox" name="remember_me" class="js-cookie">',
+            '<input type="checkbox" name="remember_me" value="remember" class="js-cookie">',
             $html
         );
 
@@ -247,7 +247,7 @@ class FormRendererDefaultLayoutTest extends TestCase
     /** @test */
     public function it_should_render_a_row_with_a_checkbox_element()
     {
-        $rememberMe = new Checkbox('remember_me');
+        $rememberMe = new Checkbox('remember_me', 'remember');
         $rememberMe->setValue('remember');
         $rememberMe->setMessages(['This is not a valid value']);
 

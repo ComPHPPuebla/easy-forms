@@ -20,6 +20,20 @@ class Checkbox extends Input
     ];
 
     /**
+     * Initially only the HTML attribute 'value' is set, since we do not have information of the value provided by the
+     * user at this moment
+     *
+     * @param string $name
+     * @param string $value
+     */
+    public function __construct($name, $value)
+    {
+        parent::__construct($name);
+        $this->attributes['value'] = $value;
+    }
+
+
+    /**
      * If a value is set, the 'checked' attribute should be added.
      *
      * @param mixed $value

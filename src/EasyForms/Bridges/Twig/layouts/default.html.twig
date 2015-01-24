@@ -80,7 +80,7 @@
     {% for group_label, choice in choices %}
         {%- if choice is iterable -%}
             <optgroup label="{{ group_label }}">
-                {% set options = choice %}
+                {%- set choices = choice -%}
                 {{- block('select_options') -}}
             </optgroup>
         {%- else -%}

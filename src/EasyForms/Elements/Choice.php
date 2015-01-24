@@ -8,7 +8,6 @@
  */
 namespace EasyForms\Elements;
 
-use Assert\Assertion;
 use EasyForms\View\ElementView;
 
 abstract class Choice extends Element
@@ -31,7 +30,6 @@ abstract class Choice extends Element
      */
     public function setChoices(array $choices)
     {
-        Assertion::allString($choices);
         $this->choices = $choices;
     }
 

@@ -8,6 +8,7 @@
  */
 namespace EasyForms\Elements;
 
+use Assert\Assertion;
 use EasyForms\View\ElementView;
 use EasyForms\View\SelectView;
 

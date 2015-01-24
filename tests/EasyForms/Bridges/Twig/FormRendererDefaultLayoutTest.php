@@ -169,6 +169,32 @@ class FormRendererDefaultLayoutTest extends TestCase
     }
 
     /** @test */
+    public function it_should_render_a_select_with_option_groups()
+    {
+        $languages = new Select('languages', [
+            'Compiled' => [
+                'J' => 'Java',
+                'S' => 'Scala',
+                'C' => 'C#',
+            ],
+            'Scripting' => [
+                'P' => 'PHP',
+                'J' => 'JavaScript',
+                'R' => 'Ruby',
+            ],
+        ]);
+        $languages->enableMultipleSelection();
+        $languages->setValue(['S', 'P']);
+
+        $html = $this->renderer->renderElement($languages->buildView(), ['class' => 'js-tooltip']);
+
+        $this->assertEquals(
+            '<select name="languages[]" multiple class="js-tooltip" multiple><optgroup label="Compiled"><option value="J">Java</option><option value="S" selected>Scala</option><option value="C">C#</option></optgroup><optgroup label="Scripting"><option value="P" selected>PHP</option><option value="J">JavaScript</option><option value="R">Ruby</option></optgroup></select>',
+            $html
+        );
+    }
+
+    /** @test */
     public function it_should_render_a_multiple_select_element()
     {
         $categories = new Select('categories', [100 => 'Electronics', 200 => 'Video games']);

@@ -11,6 +11,15 @@
     {{- errors(element) -}}
 {%- endblock hidden_row %}
 
+{% block multi_checkbox_row -%}
+    <div>
+        {{- label(element, label, attr['id']|default(null), label_attr|default([])) -}}
+        {%- set choices = element.choices -%}
+        {{- block('multi_checkbox') -}}
+        {{- errors(element) -}}
+    </div>
+{%- endblock multi_checkbox_row %}
+
 {% block checkbox_row -%}
     <div>
         {{- block('checkbox_label') -}}
@@ -30,10 +39,22 @@
     <textarea{{ block('attributes') }}>{{ value }}</textarea>
 {%- endblock textarea %}
 
+{% block multi_checkbox %}
+    {%- for value, label in choices -%}
+        {% set attr = attr|merge({'value': value}) %}
+        {%- if value in element.value -%}
+            {% set attr = attr|merge({'checked': true}) %}
+        {%- else -%}
+            {% set attr = attr|merge({'checked': false}) %}
+        {%- endif -%}
+        {{- block('checkbox_label') -}}
+    {%- endfor -%}
+{% endblock multi_checkbox %}
+
 {% block checkbox_label -%}
     {%- set label_attr = label_attr|default([]) -%}
     <label{% for attrname, attrvalue in label_attr %} {{ attrname }}="{{ attrvalue }}"{% endfor %}>
-    {{- element(element, attr|default([])) -}}{{ label }}</label>
+    {{- block('input') -}}{{ label }}</label>
 {%- endblock checkbox_label %}
 
 {% block input -%}

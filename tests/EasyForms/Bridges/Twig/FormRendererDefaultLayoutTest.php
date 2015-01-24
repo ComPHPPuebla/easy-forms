@@ -11,6 +11,7 @@ namespace EasyForms\Bridges\Twig;
 use EasyForms\Elements\Checkbox;
 use EasyForms\Elements\File;
 use EasyForms\Elements\Hidden;
+use EasyForms\Elements\MultiCheckbox;
 use EasyForms\Elements\Radio;
 use EasyForms\Elements\Select;
 use EasyForms\Elements\Text;
@@ -136,6 +137,19 @@ class FormRendererDefaultLayoutTest extends TestCase
     }
 
     /** @test */
+    public function it_should_render_a_multi_checkbox_element()
+    {
+        $languages = new MultiCheckbox('languages', ['PHP', 'Scala', 'C#']);
+        $languages->setValue([0, 1]);
+
+        $html = $this->renderer->renderElement($languages->buildView(), ['class' => 'js-cookie']);
+        $this->assertEquals(
+            '<label><input type="checkbox" name="languages[]" class="js-cookie" value="0" checked>PHP</label><label><input type="checkbox" name="languages[]" class="js-cookie" value="1" checked>Scala</label><label><input type="checkbox" name="languages[]" class="js-cookie" value="2" >C#</label>',
+            $html
+        );
+    }
+
+    /** @test */
     public function it_should_render_a_select_element()
     {
         $categories = new Select('categories', [100 => 'Electronics', 200 => 'Video games']);
@@ -219,6 +233,24 @@ class FormRendererDefaultLayoutTest extends TestCase
 
         $this->assertEquals(
             '<div><label class="form-label"><input type="checkbox" name="remember_me" value="remember" checked class="js-validate">Remember me</label><ul><li>This is not a valid value</li></ul></div>',
+            $html
+        );
+    }
+
+    /** @test */
+    public function it_should_render_a_row_with_a_multi_checkbox_element()
+    {
+        $languages = new MultiCheckbox('languages', ['PHP', 'Scala', 'C#']);
+        $languages->setValue([0, 1]);
+        $languages->setMessages(['Something went wrong']);
+
+        $html = $this->renderer->renderRow($languages->buildView(), [
+            'label' => 'Programming languages',
+            'label_attr' => ['class' => 'form-label'],
+            ['class' => 'js-cookie']
+        ]);
+        $this->assertEquals(
+            '<div><label class="form-label">Programming languages</label><label class="form-label"><input type="checkbox" name="languages[]" value="0" checked>PHP</label><label class="form-label"><input type="checkbox" name="languages[]" value="1" checked>Scala</label><label class="form-label"><input type="checkbox" name="languages[]" value="2" >C#</label><ul><li>Something went wrong</li></ul></div>',
             $html
         );
     }

@@ -40,6 +40,7 @@
 {%- endblock textarea %}
 
 {% block multi_checkbox %}
+    {%- set attr = attr|merge({'name': attr.name ~ '[]'}) -%}
     {%- for value, label in choices -%}
         {% set attr = attr|merge({'value': value}) %}
         {%- if value in element.value -%}

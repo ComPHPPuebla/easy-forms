@@ -18,17 +18,6 @@ class MultiCheckbox extends Choice
     ];
 
     /**
-     * In order to process several values, '[]' are concatenated to the element name
-     *
-     * @param string $name
-     * @param array $choices
-     */
-    public function __construct($name, array $choices = [])
-    {
-        parent::__construct("{$name}[]", $choices);
-    }
-
-    /**
      * @param ElementView $view
      * @return ElementView
      */

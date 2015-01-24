@@ -17,13 +17,6 @@ class MultiCheckboxSpec extends ObjectBehavior
         $this->beConstructedWith('languages');
     }
 
-    function it_should_add_squared_brackets_to_the_element_name()
-    {
-        $view = $this->buildView();
-
-        $view->attributes['name']->shouldBe('languages[]');
-    }
-
     function it_should_have_access_to_its_options()
     {
         $this->setChoices($languages = [

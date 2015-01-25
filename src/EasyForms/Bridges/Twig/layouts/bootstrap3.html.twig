@@ -71,6 +71,7 @@
     {%- if errors|length > 0 -%}
         <ul class="list-unstyled">
             {%- for error in errors -%}
+                {%- if error is iterable -%}{% set error = error|join(',') %}{%- endif -%}
                 <li class="text-danger"><span class="glyphicon glyphicon-exclamation-sign"></span> {{ error }}</li>
             {%- endfor -%}
         </ul>

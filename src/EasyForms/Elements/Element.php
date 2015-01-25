@@ -69,7 +69,6 @@ abstract class Element
      */
     public function setMessages(array $messages)
     {
-        Assertion::allString($messages);
         $this->messages = $messages;
     }
 

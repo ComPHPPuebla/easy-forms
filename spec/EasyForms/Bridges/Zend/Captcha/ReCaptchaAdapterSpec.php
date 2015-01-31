@@ -9,31 +9,31 @@
 namespace spec\EasyForms\Bridges\Zend\Captcha;
 
 use PhpSpec\ObjectBehavior;
-use Zend\Captcha\Image;
+use Zend\Captcha\ReCaptcha;
 
-class ImageCaptchaAdapterSpec extends ObjectBehavior
+class ReCaptchaAdapterSpec extends ObjectBehavior
 {
-    function let(Image $captcha)
+    function let(ReCaptcha $captcha)
     {
         $this->beConstructedWith($captcha);
     }
 
-    function it_should_generate_captcha_id(Image $captcha)
+    function it_should_generate_captcha_id(ReCaptcha $captcha)
     {
         $this->generate();
 
         $captcha->generate()->shouldHaveBeenCalled();
     }
 
-    function it_should_get_the_configured_captcha_image_url(Image $captcha)
+    function it_should_get_the_configured_public_key(ReCaptcha $captcha)
     {
         $this->options();
 
-        $captcha->getImgUrl()->shouldHaveBeenCalled();
+        $captcha->getPubkey()->shouldHaveBeenCalled();
     }
 
     function it_should_get_the_captcha_adapter_name()
     {
-        $this->name()->shouldBe('image');
+        $this->name()->shouldBe('re_captcha');
     }
 }

@@ -11,3 +11,31 @@
     {%- set attr = attr|merge({type: 'hidden', value: options.captcha_id, name: name ~ '[id]'}) -%}
     <input{{ block('attributes') }}>
 {%- endblock captcha_image %}
+
+{% block captcha_re_captcha -%}
+    <input type="hidden" name="{{ attr.name }}[recaptcha_challenge_field]" id="{{ attr.name }}-challenge">
+    <input type="hidden" name="{{ attr.name }}[recaptcha_response_field]" id="{{ attr.name }}-response">
+    <script type="text/javascript">var RecaptchaOptions = {"theme":"red","lang":"en"};</script>
+    <script type="text/javascript" src="{{ options.host }}/challenge?k={{ options.public_key }}"></script>
+    <noscript>
+        <iframe src="{{ options.host }}/noscript?k={{ options.public_key }}" height="300" width="500" frameborder="0"></iframe><br>
+        <textarea name="{{ attr.name }}[recaptcha_challenge_field]" rows="3" cols="40"></textarea>
+        <input type="hidden" name="{{ attr.name }}[recaptcha_response_field]" value="manual_challenge">
+    </noscript>
+    <script type="text/javascript">
+        function windowOnLoad(fn) {
+            var old = window.onload;
+            window.onload = function () { if (old) old(); fn(); };
+        }
+        function bindEvent(el, eventName, eventHandler) {
+            if (el.addEventListener) el.addEventListener(eventName, eventHandler, false);
+            else if (el.attachEvent)  el.attachEvent('on'+eventName, eventHandler);
+        }
+        windowOnLoad(function () {
+            bindEvent(document.getElementById("{{ attr.name }}-challenge").form, 'submit', function () {
+                document.getElementById("{{ attr.name }}-challenge").value = document.getElementById("recaptcha_challenge_field").value;
+                document.getElementById("{{ attr.name }}-response").value = document.getElementById("recaptcha_response_field").value;
+            });
+        });
+    </script>
+{% endblock captcha_re_captcha -%}

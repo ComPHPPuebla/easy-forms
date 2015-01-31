@@ -27,17 +27,9 @@ class ImageCaptchaAdapter implements CaptchaAdapter
     /**
      * @return string
      */
-    public function generateId()
+    public function generate()
     {
         return $this->imageCaptcha->generate();
-    }
-
-    /**
-     * @return string
-     */
-    public function word()
-    {
-        return $this->imageCaptcha->getWord();
     }
 
     /**

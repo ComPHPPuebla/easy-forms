@@ -13,12 +13,7 @@ interface CaptchaAdapter
     /**
      * @return string
      */
-    public function generateId();
-
-    /**
-     * @return string
-     */
-    public function word();
+    public function generate();
 
     /**
      * This name is used to identify a specific block to render

@@ -38,8 +38,7 @@ class Captcha extends Element
         $view = parent::buildView($view);
 
         $view->options = array_merge([
-            'captcha_id' => $this->captchaAdapter->generateId(),
-            'word' => $this->captchaAdapter->word(),
+            'captcha_id' => $this->captchaAdapter->generate(),
         ], $this->captchaAdapter->options());
 
         $view->value = $view->options['captcha_id'];

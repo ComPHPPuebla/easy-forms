@@ -16,8 +16,7 @@ class CaptchaSpec extends ObjectBehavior
     function it_should_build_view_with_the_correct_values_depending_on_the_adapter(CaptchaAdapter $adapter)
     {
         $this->beConstructedWith('captcha', $adapter);
-        $adapter->generateId()->willReturn($captchaId = '123456');
-        $adapter->word()->willReturn($word = 'aa2bbb3456ct');
+        $adapter->generate()->willReturn($captchaId = '123456');
         $adapter->name()->willReturn('image');
         $adapter->options()->willReturn(['images_url' => $imagesUrl = 'images/capctha']);
 
@@ -29,7 +28,6 @@ class CaptchaSpec extends ObjectBehavior
         $view->value->shouldBe($captchaId);
         $view->options->shouldBe([
             'captcha_id' => $captchaId,
-            'word' => $word,
             'images_url' => $imagesUrl,
         ]);
         $view->block->shouldBe('captcha_image');

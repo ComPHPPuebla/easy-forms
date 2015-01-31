@@ -61,7 +61,7 @@ class FormRendererTest extends TestCase
 
 class FakeCaptchaAdapter implements Captcha\CaptchaAdapter
 {
-    public function generateId() { return mt_rand(); }
+    public function generate() { return mt_rand(); }
 
     public function word() { return md5(mt_rand()); }
 

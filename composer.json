@@ -30,7 +30,8 @@
         "zendframework/zend-inputfilter": "~2.3",
         "zendframework/zend-captcha": "~2.3",
         "phpspec/phpspec": "~2.1",
-        "phpunit/phpunit": "~4.4"
+        "phpunit/phpunit": "~4.4",
+        "zendframework/zendservice-recaptcha": "~2.0"
     },
     "extra": {
         "branch-alias": {

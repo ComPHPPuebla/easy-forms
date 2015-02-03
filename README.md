@@ -9,31 +9,31 @@ related to forms processing.
 * Validation
 * Translation
 
-However both packages require several dependencies, even for the simplest case (internationalization,
+However both packages have several dependencies, even for the simplest case (internationalization,
 validation, and event dispatching packages for instance). For form rendering both packages need to
 use translation components.
 
 This package is intended to be used as a glue for the packages that provide the above mentioned
 functionality.
 
-Initially this package provides form rendering with [Twig][3], validation with [Zend input filter][4],
+This package provides, initially, form rendering with [Twig][3], validation with [Zend input filter][4],
 CSRF tokens with [Symfony Security CSRF][5], captchas with [Zend Captcha][6].
 
 All these dependencies are *optional* and more adapters can be added to provide the same
-functionality with another packages.
+functionality with other packages.
 
 If you are already using a form component as part of its corresponding framework, you probably will
 not find this package very useful. This package is intended to be used when you need a light
-integration and you don't need or want to install more packages than you already have or need.
+integration and you don't need or want to install more packages than you already have.
 
 ## Creating forms
 
 One of the goals of this package is separating the functionality to process the form in the backend
 from the rendering which is a frontend concern.
 
-When you create a form you only need to know the elements names, and its type, in order to know
+When you create a form you only need to know the elements names, and its types, in order to know
 how to retrieve its values and whether an element can have multiple values or not. Other HTML
-attributes like classes, IDS or the label for an element should not be defined in the element itself, all
+attributes like classes, IDS or the element's labels should not be defined in the element itself, all
 those values should be specified when the form is rendered, because that is a presentation concern.
 
 The simplest way to create a form is inheriting from `EasyForms\Form` and add elements to it in the
@@ -45,19 +45,23 @@ class LoginForm extends EasyForms\Form
     public function __construct()
     {
         $this
-            ->add(new EasyForms\Elements\Text('username')
-            ->add(new EasyForms\Elements\Password('password')
+            ->add(new EasyForms\Elements\Text('username'))
+            ->add(new EasyForms\Elements\Password('password'))
         ;
     }
 }
 ```
 
+If you add a `File` element, the form will update its `enctype` attribute to `multipart/form-data`
+automatically.
+
 ## Validating forms
 
 Another concern is validation, you could use this package only to render forms and keep on
-validating and sanitizing your form inputs without having to couple it to your form.
+validating and sanitizing your form inputs without having to couple validation components
+to your form.
 
-For instance, if you are using the Zend's input filter package, you could validate your inputs and pass
+For instance, if you are using the Zend input filter package, you could validate your inputs and pass
 the error messages directly to the view. Suppose you have this filter to validate your form.
 
 ```php
@@ -81,7 +85,6 @@ class LoginFilter extends InputFilter
     protected function buildUsernameInput()
     {
         $username = new Input('username');
-
         $username
             ->getValidatorChain()
             ->attach(new NotEmpty())
@@ -89,12 +92,10 @@ class LoginFilter extends InputFilter
                 'min' => 3,
             ]))
         ;
-
         $username
             ->getFilterChain()
             ->attach(new StringTrim())
         ;
-
         return $username;
     }
 
@@ -108,13 +109,12 @@ class LoginFilter extends InputFilter
                 'min' => 8,
             ]))
         ;
-
         return $password;
     }
 }
 ```
 
-You could validate your form this way:
+Then, you could validate your form this way:
 
 ```php
 $form = new LoginForm();
@@ -126,8 +126,8 @@ if (!$filter->isValid() {
 }
 ```
 
-And the form would not be aware of the library that performs the validation. However this package
-provides an optional integration in order to avoid repeating the above code.
+And the form would not be aware of the library that performs the validation. However, this package
+provides an optional integration in order to encapsulate the behaviour to validate form inputs.
 
 ```php
 use EasyForms\Bridges\Zend\InputFilter\InputFilterValidator;
@@ -145,21 +145,21 @@ $isValid = $validator->validate($form);
 ## Form rendering
 
 This package uses Twig and is heavily inspired by the way the Symfony form component renders a
-form. Form rendering can be customized through themes. A theme is a set of Twig templates which
-contain blocks that customize the way a form element is rendered.
+form. Form rendering can be customized through *themes*. A theme is a set of Twig templates which
+contain *blocks* to customize the way a form element is rendered.
 
 A form element is rendered in three parts
 
 * A label
 * The HTML element
-* Its error messages, if any
+* Its error messages, if any.
 
 This package has 2 built-in themes:
 
-* The default layout, which groups a form element in divs
+* The default layout, which groups form elements in divs
 * The Bootstrap 3 layout which extends the default layout
 
-In order to use them you have to register the `FormExtension` provided in this package.
+In order to use the themes you have to register the `FormExtension` provided in this package.
 
 ```php
 use EasyForms\Bridges\Twig\BlockOptions;
@@ -172,7 +172,7 @@ $loader = new Twig_Loader([
     'path/to/your/application/templates',
 ]);
 $twig = new Twig_Environment($loader);
-// use the bootstrap layout
+// use the Bootstrap 3 layout
 $renderer = new FormRenderer(
     new FormTheme($twig, 'layouts/bootstrap.html.twig'),
     new BlockOptions()
@@ -188,7 +188,7 @@ $view->render('user/login.html.twig', [
 ]);
 ```
 
-The extension defines some functions, among the most importants are `form_start`, `form_end`, and
+The extension defines some functions, among the most important are `form_start`, `form_end`, and
 `element_row`. The first 2 functions are simple.
 
 ```twig
@@ -201,18 +201,46 @@ The extension defines some functions, among the most importants are `form_start`
 {{ form_end() }}
 ```
 
-The `form_row` has 2 parameters, the form element, and an associative array of options. The options
+The `element_row` has 2 parameters, the form element, and an associative array of options. The options
 are not mandatory, and can be explained as follows:
 
 * `label`. The element 's label
 * `label_attr`. The label's HTML attributes
 * `attr`. The elements HTML  attributes
-* `options`. This one is used mainly to override the default blocks that render the elements parts
+* `options`. This one is used mainly to override the default blocks that render the elements
 (label, element and error messages, among others).
 
 In the previous example we use the options to define the elements labels, and its HTML ID which could
 be used for client side validation, for instance.
 
+If you want to display a form element in a different way only for a template, you could add
+the template that renders the form to the theme's templates and define a custom block.
+Suppose you have an `ProductForm` class with 3 form elements, a text element with the name of
+the product, a text area with an optional description, and another text element to enter a
+unit price. To add the current template to the theme you will need to use the `form_theme` token
+and pass the value `self` as argument, you can add more than one template this way, therefore
+the value should be inside an array.
+
+```twig
+{# Use this template as an inline layout #}
+{% form_theme [_self] %}
+{# Custom block #}
+{%- block money -%}
+    <div class="input-group"><div class="input-group-addon">$</div>
+        {%- set options = options|merge({'block': 'input'}) -%}
+        {{- element(element, attr, options) -}}
+    <div class="input-group-addon">.00</div></div>
+{%- endblock money -%}
+{{ form_start(form) }}
+{{ element_row(form.name, {'label': 'Name', 'attr': {'id': 'name'}}) }}
+{{ element_row(form.description, {'label': 'Description', 'attr': {'id': 'description'}}) }}
+{# Override the element's default rendering block with the block option #}
+{{ element_row(form.unitPrice, {'label': 'Unit price', 'attr': {'id': 'price'}, 'options': options|default([])}) }}
+<button type="submit" class="btn btn-default">
+    <span class="glyphicon glyphicon-th-list"></span> Add to catalog
+</button>
+{{ form_end() }}
+```
 
 [1]: http://symfony.com/doc/current/components/form/introduction.html
 [2]: http://framework.zend.com/manual/current/en/modules/zend.form.intro.html

@@ -39,7 +39,7 @@ class InputFilterValidator implements FormValidator
         $this->inputFilter->setData($form->values());
 
         if (!$isValid = $this->inputFilter->isValid()) {
-            $form->setMessages($this->inputFilter->getMessages());
+            $form->setErrorMessages($this->inputFilter->getMessages());
 
             return $isValid;
         }

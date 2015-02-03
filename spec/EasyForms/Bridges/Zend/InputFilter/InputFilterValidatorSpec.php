@@ -29,7 +29,7 @@ class InputFilterValidatorSpec extends ObjectBehavior
         $form->values()->willReturn($submittedValues);
         $form->submit($submittedValues)->shouldBeCalled();
 
-        $form->setMessages(Argument::type('array'))->shouldNotBeCalled();
+        $form->setErrorMessages(Argument::type('array'))->shouldNotBeCalled();
 
         $this->validate($form);
     }
@@ -48,7 +48,7 @@ class InputFilterValidatorSpec extends ObjectBehavior
         $filter->getMessages()->willReturn($errors);
         $form->values()->willReturn($submittedValues);
 
-        $form->setMessages($errors)->shouldBeCalled();
+        $form->setErrorMessages($errors)->shouldBeCalled();
 
         $this->validate($form);
     }

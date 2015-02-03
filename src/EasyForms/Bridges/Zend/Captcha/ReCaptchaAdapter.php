@@ -57,5 +57,4 @@ class ReCaptchaAdapter implements CaptchaAdapter
             'public_key' => $this->reCaptcha->getPubkey(),
         ];
     }
-
 }

@@ -71,7 +71,7 @@ class FormSpec extends ObjectBehavior
 
         $this->add($username)->add($password);
 
-        $this->setMessages([
+        $this->setErrorMessages([
             'username' => $usernameMessages,
         ]);
     }

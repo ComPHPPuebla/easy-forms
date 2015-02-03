@@ -102,7 +102,7 @@ class Form
     /**
      * @param array $messages
      */
-    public function setMessages(array $messages)
+    public function setErrorMessages(array $messages)
     {
         foreach ($messages as $name => $message) {
             $this->get($name)->setMessages($message);

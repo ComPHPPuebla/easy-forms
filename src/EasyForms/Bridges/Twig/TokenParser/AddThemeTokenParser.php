@@ -9,7 +9,6 @@
 namespace EasyForms\Bridges\Twig\TokenParser;
 
 use EasyForms\Bridges\Twig\Node\FormThemeNode;
-use Twig_Node_Expression_Array as ArrayExpression;
 use Twig_TokenParser as TokenParser;
 use Twig_Token as Token;
 

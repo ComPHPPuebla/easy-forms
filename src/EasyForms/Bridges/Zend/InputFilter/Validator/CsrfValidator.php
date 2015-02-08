@@ -42,21 +42,13 @@ class CsrfValidator extends AbstractValidator
     /**
      * Constructor
      *
-     * @param  array|Traversable $options{
+     * @param  array $options{
      *     @var array   $tokenProvider The token provider implementation
      *     @var string  $tokenId       The token identifier
      * }
      */
-    public function __construct($options = null)
+    public function __construct(array $options = [])
     {
-        if ($options instanceof Traversable) {
-            $options = ArrayUtils::iteratorToArray($options);
-        }
-
-        if (!is_array($options)) {
-            $options = (array) $options;
-        }
-
         Assertion::keyExists(
             $options,
             'tokenProvider',

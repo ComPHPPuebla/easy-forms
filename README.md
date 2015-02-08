@@ -1,6 +1,7 @@
 # Easy form handling for PHP
 
 [![Build Status](https://travis-ci.org/ComPHPPuebla/easy-forms.svg?branch=master)](https://travis-ci.org/ComPHPPuebla/easy-forms)
+[![SensioLabsInsight](https://insight.sensiolabs.com/projects/b21b5fac-a347-4c1a-b9b0-9965a93893ea/mini.png)](https://insight.sensiolabs.com/projects/b21b5fac-a347-4c1a-b9b0-9965a93893ea)
 
 Most popular PHP packages (like [Symfony][1] and [Zend][2]) provide support for
 the following tasks related to forms processing.

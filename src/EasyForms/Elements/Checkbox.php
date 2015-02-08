@@ -8,8 +8,6 @@
  */
 namespace EasyForms\Elements;
 
-use Assert\Assertion;
-use EasyForms\View\CheckboxView;
 use EasyForms\View\ElementView;
 
 class Checkbox extends Input

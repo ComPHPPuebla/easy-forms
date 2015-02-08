@@ -124,6 +124,7 @@ $filter->setData($_POST);
 if (!$filter->isValid() {
     $form->setErrorMessages($filter->getMessages());
 }
+$form->submit($filter->getValues());
 ```
 
 And the form would not be aware of the library that performs the validation. However, this package
@@ -137,9 +138,7 @@ $validator = new InputFilterValidator(new LoginFilter());
 
 $form->submit($_POST);
 
-$isValid = $validator->validate($form);
-
-// Form would have the errors messages, if needed, and its values would be filtered
+$validator->validate($form); // Form would have the errors messages, if needed, and its values would be filtered
 ```
 
 ## Form rendering
@@ -235,12 +234,14 @@ the value should be inside an array.
 {{ element_row(form.name, {'label': 'Name', 'attr': {'id': 'name'}}) }}
 {{ element_row(form.description, {'label': 'Description', 'attr': {'id': 'description'}}) }}
 {# Override the element's default rendering block with the block option #}
-{{ element_row(form.unitPrice, {'label': 'Unit price', 'attr': {'id': 'price'}, 'options': options|default([])}) }}
+{{ element_row(form.unitPrice, {'label': 'Unit price', 'options': {'block': 'money'}}) }}
 <button type="submit" class="btn btn-default">
     <span class="glyphicon glyphicon-th-list"></span> Add to catalog
 </button>
 {{ form_end() }}
 ```
+
+You can find some working examples (a small Slim application) in this [repository][7]
 
 [1]: http://symfony.com/doc/current/components/form/introduction.html
 [2]: http://framework.zend.com/manual/current/en/modules/zend.form.intro.html
@@ -248,3 +249,4 @@ the value should be inside an array.
 [4]: http://framework.zend.com/manual/current/en/modules/zend.input-filter.intro.html
 [5]: https://github.com/symfony/security-csrf
 [6]: http://framework.zend.com/manual/current/en/modules/zend.captcha.intro.html
+[7]: https://github.com/MontealegreLuis/easy-forms-examples

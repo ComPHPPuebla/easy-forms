@@ -2,42 +2,95 @@
 
 [![Build Status](https://travis-ci.org/ComPHPPuebla/easy-forms.svg?branch=master)](https://travis-ci.org/ComPHPPuebla/easy-forms)
 
-Most popular PHP packages (like [Symfony][1] and [Zend][2]) provide support for the following tasks
-related to forms processing.
+Most popular PHP packages (like [Symfony][1] and [Zend][2]) provide support for
+the following tasks related to forms processing.
 
 * Rendering
 * Validation
 * Translation
 
-However both packages have several dependencies, even for the simplest case (internationalization,
-validation, and event dispatching packages for instance). For form rendering both packages need to
-use translation components.
+However both packages have several dependencies, even for the simplest case
+(internationalization, validation, and event dispatching packages for instance).
+For form rendering both packages need to use translation components.
 
-This package is intended to be used as a glue for the packages that provide the above mentioned
-functionality.
+This package is intended to be used as a glue for the packages that provide the
+above mentioned functionality.
 
-This package provides, initially, form rendering with [Twig][3], validation with [Zend input filter][4],
-CSRF tokens with [Symfony Security CSRF][5], captchas with [Zend Captcha][6].
+This package provides, initially, form rendering with [Twig][3], validation with
+[Zend input filter][4], CSRF tokens with [Symfony Security CSRF][5], captcha
+elements with [Zend Captcha][6].
 
-All these dependencies are *optional* and more adapters can be added to provide the same
-functionality with other packages.
+All these dependencies are *optional* and more adapters can be added to provide
+the same functionality with other packages.
 
-If you are already using a form component as part of its corresponding framework, you probably will
-not find this package very useful. This package is intended to be used when you need a light
-integration and you don't need or want to install more packages than you already have.
+If you are already using a form component as part of its corresponding framework,
+you probably will not find this package very useful. This package is intended to
+be used when you need a light integration and you don't need or want to install
+more packages than you already have.
 
-## Creating forms
+## Installation
 
-One of the goals of this package is separating the functionality to process the form in the backend
-from the rendering which is a frontend concern.
+Using Composer
 
-When you create a form you only need to know the elements names, and its types, in order to know
-how to retrieve its values and whether an element can have multiple values or not. Other HTML
-attributes like classes, IDS or the element's labels should not be defined in the element itself, all
-those values should be specified when the form is rendered, because that is a presentation concern.
+```bash
+$ composer require comphppuebla/easy-forms:~1.0@dev
+```
 
-The simplest way to create a form is inheriting from `EasyForms\Form` and add elements to it in the
-constructor.
+## Usage
+
+### Form elements
+
+The only required attribute for an element in this package is its name, and
+an optional set of choices.
+
+```php
+use EasyForms\Elements;
+
+$name = new Elements\Text('name');
+$password = new Elements\Password('password');
+$userId = new Elements\Hidden('user_id');
+$description = new Elements\TextArea('description');
+$avatar = new Elements\File('avatar');
+$termsAndConditions = new Elements\Checkbox('terms', $checkedValue = 'accept');
+$gender = new Elements\Radio('gender', $choices = [
+    'M' => 'Male', 'F' => 'Female'
+]);
+$position = new Elements\Select('position', $choices = [
+    'b'=> 'Backend developer', 'f' => 'Frontend Developer'
+]);
+$interests = new Elements\MultiCheckbox('interests', $choices = [
+    'u' => 'Usability', 's' => 'Security', 't' => 'Testing'
+]);
+```
+
+Choices can be omitted in the constructor of elements like `Radio`, `Select`,
+and `MultiCheckbox`, and injected later via the `setChoices` method.
+
+```php
+$gender->setChoices([
+    'M' => 'Male', 'F' => 'Female'
+]);
+$position->setChoices([
+    'b'=> 'Backend developer', 'f' => 'Frontend Developer'
+]);
+$interests->setChoices([
+    'u' => 'Usability', 's' => 'Security', 't' => 'Testing'
+]);
+```
+
+You can also make elements optional, and pass them error messages. Unlike other
+form components, elements in this package are not responsible of validation
+and filtering.
+
+```php
+$description->makeOptional();
+$password->setMessages(['Please enter your password']);
+```
+
+### Creating forms
+
+The simplest way to create a form is inheriting from `EasyForms\Form` and add
+elements to it in its constructor.
 
 ```php
 class LoginForm extends EasyForms\Form
@@ -52,10 +105,52 @@ class LoginForm extends EasyForms\Form
 }
 ```
 
-If you add a `File` element, the form will update its `enctype` attribute to `multipart/form-data`
-automatically.
+However you could simple create an `EasyForms\Form` object and start adding
+elements.
 
-## Validating forms
+```php
+$loginForm = new EasyForms\Form();
+$loginForm
+    ->add(new EasyForms\Elements\Text('username'))
+    ->add(new EasyForms\Elements\Password('password'))
+;
+```
+
+If you add a `File` element, the form will update its `enctype` attribute to
+`multipart/form-data` automatically.
+
+Notice that when you create a form you only need to know its elements names,
+and its types. You need the names in order to know how to retrieve its values,
+from `$_GET`, `$_POST` and `$_FILES`. You need its types in order to know
+whether an element can have multiple values or not (its value is either a
+string or an array).
+
+Once you have the form you can populate its values with any of the
+super-globals, populate its error messages, if needed, and pass it to your
+template engine.
+
+```php
+$loginForm->submit(array_merge($_POST, $_FILES));
+$loginForm->setErrorMessages($errors);
+$view->render('your-template.html', ['form' => $loginForm->buildView()]);
+```
+
+Both elements and forms have a view representation that exposes the attributes
+that the templates need to render them.
+
+```php
+$form->attributes; // Form's HTML attributes
+$interests = $form->interests; // Form elements can be accessed through its name
+$interests->attributes; // Element's HTML attributes
+$interests->value;
+$interests->isRequired;
+$interests->isValid; // true if there's at least 1 error message
+$interests->messages; // validation messages
+$interests->choices; // empty if the element is not a subclass of Choice
+$interests->isSelected('testing') // Helper method for elements with choices
+```
+
+### Validating forms
 
 Another concern is validation, you could use this package only to render forms and keep on
 validating and sanitizing your form inputs without having to couple validation components
@@ -141,7 +236,7 @@ $form->submit($_POST);
 $validator->validate($form); // Form would have the errors messages, if needed, and its values would be filtered
 ```
 
-## Form rendering
+### Form rendering
 
 This package uses Twig and is heavily inspired by the way the Symfony form component renders a
 form. Form rendering can be customized through *themes*. A theme is a set of Twig templates which

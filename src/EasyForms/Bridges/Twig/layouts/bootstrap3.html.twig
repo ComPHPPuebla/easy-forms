@@ -1,7 +1,7 @@
 {% extends 'layouts/default.html.twig' %}
 
 {% block element_row -%}
-    <div class="form-group{% if not valid %} has-error{% endif %}">
+    <div class="form-group{% if not isValid %} has-error{% endif %}">
         {{- label(element, label, attr['id']|default(null), label_attr|default([])) -}}
         {{- element(element, attr|default([]), options|default([])) -}}
         {{- errors(element) -}}
@@ -9,7 +9,7 @@
 {%- endblock element_row %}
 
 {% block checkbox_row -%}
-    <div{% if not valid %} class="has-error"{% endif %}>
+    <div{% if not isValid %} class="has-error"{% endif %}>
         {{- block('checkbox_label') -}}
         {{- errors(element) -}}
     </div>
@@ -33,7 +33,7 @@
 {%- endblock checkbox_label %}
 
 {% block radio_row -%}
-    <div class="form-group{% if not valid %} has-error{% endif %}">
+    <div class="form-group{% if not isValid %} has-error{% endif %}">
         {{- label(element, label, null, label_attr|default([])) -}}
         {{- element(element, attr|default([])) -}}
         {{- errors(element) -}}

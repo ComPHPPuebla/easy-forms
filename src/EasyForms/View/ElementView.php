@@ -28,7 +28,7 @@ class ElementView
     public $messages = [];
 
     /** @var boolean */
-    public $valid;
+    public $isValid;
 
     /** @var boolean  */
     public $isRequired;

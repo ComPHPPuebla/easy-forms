@@ -117,7 +117,7 @@ class FormRendererSpec extends ObjectBehavior
         $usernameView = $username->buildView();
         $processedOptions = [
             'element' => $usernameView,
-            'valid' => $usernameView->valid,
+            'isValid' => $usernameView->isValid,
             'attr' => $usernameView->attributes + $options['attr'],
             'options' => [],
             'label' => $options['label'],

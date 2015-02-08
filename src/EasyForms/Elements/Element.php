@@ -100,7 +100,7 @@ abstract class Element
 
         $view->attributes = $this->attributes;
         $view->messages = $this->messages;
-        $view->valid = count($this->messages) === 0;
+        $view->isValid = count($this->messages) === 0;
         $view->value = $this->value();
         $view->isRequired = $this->isRequired;
         $view->rowBlock = 'element_row';

@@ -71,7 +71,7 @@ class BlockOptionsTest extends TestCase
 
         $this->assertEquals([
             'element' => $productIdView,
-            'valid' => true,
+            'isValid' => true,
             'attr' => ['class' => 'js-id', 'type' => 'hidden', 'name' => 'product_id'],
             'options' => [],
         ], $processedOptions);
@@ -92,7 +92,7 @@ class BlockOptionsTest extends TestCase
 
         $this->assertEquals([
             'element' => $nameView,
-            'valid' => true,
+            'isValid' => true,
             'attr' => ['class' => 'js-tooltip', 'type' => 'text', 'name' => 'name'],
             'options' => [],
             'label' => 'Name',
@@ -116,7 +116,7 @@ class BlockOptionsTest extends TestCase
 
         $this->assertEquals([
             'element' => $languagesView,
-            'valid' => true,
+            'isValid' => true,
             'attr' => ['class' => 'js-update', 'name' => 'languages'],
             'options' => ['custom_option' => 'custom_value'],
             'label' => 'Languages',

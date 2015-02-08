@@ -25,7 +25,7 @@ class BlockOptions
 
         return array_merge([
             'element' => $element,
-            'valid' => $element->valid,
+            'isValid' => $element->isValid,
             'attr' => $attr,
             'options' => $opt,
         ], $options);

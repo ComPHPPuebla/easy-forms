@@ -78,14 +78,15 @@ $interests->setChoices([
 ]);
 ```
 
-You can also make elements optional, and pass them error messages. Unlike other
-form components, elements in this package are not responsible of validation
-and filtering.
+You can also make elements optional, and pass them error messages.
 
 ```php
 $description->makeOptional();
 $password->setMessages(['Please enter your password']);
 ```
+
+Unlike other form components, elements in this package are not responsible of
+validation and filtering.
 
 ### Creating forms
 
@@ -105,7 +106,7 @@ class LoginForm extends EasyForms\Form
 }
 ```
 
-However you could simple create an `EasyForms\Form` object and start adding
+However, you could simple create an `EasyForms\Form` object and start adding
 elements.
 
 ```php

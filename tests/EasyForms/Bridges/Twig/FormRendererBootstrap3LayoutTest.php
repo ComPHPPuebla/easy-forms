@@ -9,6 +9,7 @@
 namespace EasyForms\Bridges\Twig;
 
 use EasyForms\Elements\Checkbox;
+use EasyForms\Elements\MultiCheckbox;
 use EasyForms\Elements\Radio;
 use EasyForms\Elements\Select;
 use EasyForms\Elements\Text;
@@ -128,6 +129,24 @@ class FormRendererBootstrap3LayoutTest extends TestCase
 
         $this->assertEquals(
             '<div><label class="form-label checkbox-inline"><input type="checkbox" name="remember_me" value="remember" checked class="js-validate">Remember me</label></div>',
+            $html
+        );
+    }
+
+    /** @test */
+    public function it_should_render_a_row_with_a_multi_checkbox_element()
+    {
+        $interests = new MultiCheckbox('interests', ['u' => 'Usability', 's' => 'Security', 't' => 'Testing']);
+        $interests->setValue('t');
+
+        $html = $this->renderer->renderRow($interests->buildView(), [
+            'label' => 'Let us know your interests',
+            'label_attr' => ['class' => 'form-label'],
+            'attr' => ['class' => 'js-validate'],
+        ]);
+
+        $this->assertEquals(
+            '<div class="form-group"><label class="form-label">Let us know your interests</label><div><label class="form-label checkbox-inline"><input type="checkbox" name="interests[]" class="js-validate" value="u" >Usability</label><label class="form-label checkbox-inline"><input type="checkbox" name="interests[]" class="js-validate" value="s" >Security</label><label class="form-label checkbox-inline"><input type="checkbox" name="interests[]" class="js-validate" value="t" checked>Testing</label></div></div>',
             $html
         );
     }

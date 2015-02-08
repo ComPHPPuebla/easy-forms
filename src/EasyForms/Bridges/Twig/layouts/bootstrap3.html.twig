@@ -16,7 +16,7 @@
 {%- endblock checkbox_row %}
 
 {% block multi_checkbox_row -%}
-    <div class="form-group{% if not valid %} has-error{% endif %}">
+    <div class="form-group{% if not isValid %} has-error{% endif %}">
         {{- label(element, label, attr['id']|default(null), label_attr|default([])) -}}
         <div>
             {%- set choices = element.choices -%}

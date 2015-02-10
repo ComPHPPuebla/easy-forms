@@ -585,7 +585,7 @@ class AddToCartConfiguration
 Then we would have to add a method to our form to use the information provided by
 this configuration object.
 
-```
+```php
 use EasyForms\Elements\Select;
 
 class AddToCartForm extends Form
@@ -600,6 +600,7 @@ class AddToCartForm extends Form
         $product->setChoices($configuration->getProductOptions());
     }
 }
+```
 
 We would configure our form the following way:
 

@@ -3,31 +3,40 @@
 [![Build Status](https://travis-ci.org/ComPHPPuebla/easy-forms.svg?branch=master)](https://travis-ci.org/ComPHPPuebla/easy-forms)
 [![SensioLabsInsight](https://insight.sensiolabs.com/projects/b21b5fac-a347-4c1a-b9b0-9965a93893ea/mini.png)](https://insight.sensiolabs.com/projects/b21b5fac-a347-4c1a-b9b0-9965a93893ea)
 
-Most popular PHP packages (like [Symfony][1] and [Zend][2]) provide support for
-the following tasks related to forms processing.
+This is a light library to process HTML forms in Web applications. Its main
+goal is to delegate concerns like, validation, rendering, translation, and
+dynamic modification/population to well-known components.
 
-* Rendering
-* Validation
-* Translation
+This package is intended to be used as a glue for packages that provide the
+following functionality.
 
-However both packages have several dependencies, even for the simplest case
-(internationalization, validation, and event dispatching packages for instance).
-For form rendering both packages need to use translation components.
+* Rendering ([Twig][3])
+* Validation ([Zend input filter][4])
+* Special form elements like CSRF tokens ([Symfony Security CSRF][5]), and
+Captcha elements ([Zend Captcha][6]).
 
-This package is intended to be used as a glue for the packages that provide the
-above mentioned functionality.
+All these dependencies are *optional* and more adapters can be added to
+provide the same functionality with other components.
 
-This package provides, initially, form rendering with [Twig][3], validation with
-[Zend input filter][4], CSRF tokens with [Symfony Security CSRF][5], captcha
-elements with [Zend Captcha][6].
-
-All these dependencies are *optional* and more adapters can be added to provide
-the same functionality with other packages.
+The reason behind this package is that most popular PHP packages (like
+[Symfony][1] and [Zend][2]) require you to install several dependencies,
+like translation, validation, and event dispatching packages, even if you
+don't need to use them.
 
 If you are already using a form component as part of its corresponding framework,
 you probably will not find this package very useful. This package is intended to
-be used when you need a light integration and you don't need or want to install
+be used when you need a simple integration and you don't need or want to install
 more packages than you already have.
+
+## Contents
+
+* [Installation](#installation)
+* [Usage](#usage)
+    * [Form elements](#form-elements)
+    * [Creating forms](#creating-forms)
+    * [Validating forms](#validating-forms)
+    * [Form rendering](#form-rendering)
+    * [More examples](#more-examples)
 
 ## Installation
 
@@ -154,12 +163,13 @@ $interests->isSelected('testing') // Helper method for elements with choices
 
 ### Validating forms
 
-Another concern is validation, you could use this package only to render forms and keep on
-validating and sanitizing your form inputs without having to couple validation components
-to your form.
+Another concern related to forms is validation, you could keep on validating and
+sanitizing your form inputs without having to couple validation components to your
+form.
 
-For instance, if you are using the Zend input filter package, you could validate your inputs and pass
-the error messages directly to the view. Suppose you have this filter to validate your form.
+If you are already using the Zend input filter package, you could validate your
+inputs and pass the error messages to your form so they can be rendered. Suppose
+you have this filter to validate your form.
 
 ```php
 use Zend\Filter\StringTrim;
@@ -224,8 +234,9 @@ if (!$filter->isValid() {
 $form->submit($filter->getValues());
 ```
 
-And the form would not be aware of the library that performs the validation. However, this package
-provides an optional integration in order to encapsulate the behaviour to validate form inputs.
+And the form would not be aware of the library that performs the validation. This
+package provides an optional integration in order to encapsulate the behaviour to
+validate form inputs with a Zend input filter.
 
 ```php
 use EasyForms\Bridges\Zend\InputFilter\InputFilterValidator;
@@ -235,27 +246,33 @@ $validator = new InputFilterValidator(new LoginFilter());
 
 $form->submit($_POST);
 
-$validator->validate($form); // Form would have the errors messages, if needed, and its values would be filtered
+// Form would have the errors messages, if needed, and its values would be filtered
+$validator->validate($form);
 ```
+
+In order to use a different component for validation you would need to write an
+adapter that implements the `EasyForms\Validation\FormValidator` interface.
 
 ### Form rendering
 
-This package uses Twig and is heavily inspired by the way the Symfony form component renders a
-form. Form rendering can be customized through *themes*. A theme is a set of Twig templates which
-contain *blocks* to customize the way a form element is rendered.
+This package uses Twig and is heavily inspired by the way the Symfony2 form
+component renders a form. Form rendering can be customized through *themes*. A
+theme is a set of Twig templates which contain *blocks* to customize the way a
+form element is rendered.
 
-A form element is rendered in three parts
+A form element is rendered in three parts:
 
 * A label
 * The HTML element
-* Its error messages, if any.
+* Its error messages, if any
 
 This package has 2 built-in themes:
 
 * The default layout, which groups form elements in divs
 * The Bootstrap 3 layout which extends the default layout
 
-In order to use the themes you have to register the `FormExtension` provided in this package.
+In order to use the themes you have to register the `FormExtension` provided in
+this package.
 
 ```php
 use EasyForms\Bridges\Twig\BlockOptions;
@@ -264,7 +281,8 @@ use EasyForms\Bridges\Twig\FormRenderer;
 use EasyForms\Bridges\Twig\FormTheme;
 
 $loader = new Twig_Loader([
-    'vendor/comphppuebla/easy-forms/src/EasyForms/Bridges/Twig', // Path to themes
+    // Path to themes
+    'vendor/comphppuebla/easy-forms/src/EasyForms/Bridges/Twig',
     'path/to/your/application/templates',
 ]);
 $twig = new Twig_Environment($loader);
@@ -275,8 +293,8 @@ $renderer = new FormRenderer(
 );
 $twig->addExtension(new FormExtension($renderer));
 ```
-Once you have the form extension configured, you can pass your form to any Twig template. Instead
-of passing the form you pass its view representation.
+Once you have the form extension configured, you can pass your form to any Twig
+template.
 
 ```php
 $view->render('user/login.html.twig', [
@@ -284,8 +302,20 @@ $view->render('user/login.html.twig', [
 ]);
 ```
 
-The extension defines some functions, among the most important are `form_start`, `form_end`, and
-`element_row`. The first 2 functions are simple.
+The extension defines some functions, among the most important are `form_start`,
+`form_end`, and `element_row`.
+
+The `element_row` defines 2 parameters, the form element, and an associative array
+of options. The options are not mandatory, and can be explained as follows:
+
+* `label`. The element 's label
+* `label_attr`. The label's HTML attributes
+* `attr`. The elements HTML  attributes
+* `options`. This one is used mainly to override the default blocks that render the
+elements (label, element and error messages, among others).
+
+In the following example we use the options to define the elements labels, and its
+HTML IDs which could be used for client side validation, for instance.
 
 ```twig
 {{ form_start(login) }}
@@ -297,28 +327,21 @@ The extension defines some functions, among the most important are `form_start`,
 {{ form_end() }}
 ```
 
-The `element_row` has 2 parameters, the form element, and an associative array of options. The options
-are not mandatory, and can be explained as follows:
+If you want to display a form element in a different way in only one template, you
+need to do 3 things:
 
-* `label`. The element 's label
-* `label_attr`. The label's HTML attributes
-* `attr`. The elements HTML  attributes
-* `options`. This one is used mainly to override the default blocks that render the elements
-(label, element and error messages, among others).
+1. Add the template that renders the form to the current theme
+2. Define a custom block for your element
+3. Override the block in the `options` parameter when calling `element_row`
 
-In the previous example we use the options to define the elements labels, and its HTML ID which could
-be used for client side validation, for instance.
-
-If you want to display a form element in a different way only for a template, you could add
-the template that renders the form to the theme's templates and define a custom block.
-Suppose you have an `ProductForm` class with 3 form elements, a text element with the name of
-the product, a text area with an optional description, and another text element to enter a
-unit price. To add the current template to the theme you will need to use the `form_theme` token
-and pass the value `self` as argument, you can add more than one template this way, therefore
-the value should be inside an array.
+Suppose you have a `ProductForm` class with 3 form elements, a text element with the
+name of the product, a text area with an optional description, and another text
+element to enter a unit price. To add the current template to the theme you will need
+to use the `form_theme` token and pass the value `self` as argument, you can add more
+than one template this way, therefore the value should be inside an array.
 
 ```twig
-{# Use this template as an inline layout #}
+{# Add this template to the theme #}
 {% form_theme [_self] %}
 {# Custom block #}
 {%- block money -%}
@@ -337,6 +360,8 @@ the value should be inside an array.
 </button>
 {{ form_end() }}
 ```
+
+### More examples
 
 You can find some working examples (a small Slim application) in this [repository][7]
 

@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <title>Easy form handling for PHP</title>
+
+        <link rel="stylesheet" href="http://ComPHPPuebla.github.io/easy-forms/css/bootstrap.min.css">
+        <link rel="stylesheet" href="http://ComPHPPuebla.github.io/easy-forms/css/font-awesome.min.css">
+        <link rel="stylesheet" href="http://ComPHPPuebla.github.io/easy-forms/css/highlight.dark.css">
+        <link rel="stylesheet" href="http://ComPHPPuebla.github.io/easy-forms/css/main.css">
+    </head>
+    <body>
+
+        <header class="navbar navbar-default navbar-fixed-top">
+
+            <a class="navbar-brand" href="http://ComPHPPuebla.github.io/easy-forms/">
+                Easy form handling for PHP
+                <small class="hidden-xs hidden-sm">
+                    Decoupled form processing
+                </small>
+            </a>
+
+            
+        </header>
+
+        <main class="container">
+            <div class="row">
+
+                
+                <section id="content" class="col-sm-12">
+                    <h1>Easy form handling for PHP</h1>
+<p><a href="https://travis-ci.org/ComPHPPuebla/easy-forms"><img src="https://travis-ci.org/ComPHPPuebla/easy-forms.svg?branch=master" alt="Build Status" /></a>
+<a href="https://insight.sensiolabs.com/projects/b21b5fac-a347-4c1a-b9b0-9965a93893ea"><img src="https://insight.sensiolabs.com/projects/b21b5fac-a347-4c1a-b9b0-9965a93893ea/mini.png" alt="SensioLabsInsight" /></a></p>
+<p>This is a light library to process HTML forms in Web applications. Its main
+goal is to delegate concerns like, validation, rendering, translation, and
+dynamic modification/population to well-known components.</p>
+<p>This package is intended to be used as a glue for packages that provide the
+following functionality.</p>
+<ul>
+<li>Rendering (<a href="http://twig.sensiolabs.org/">Twig</a>)</li>
+<li>Validation (<a href="http://framework.zend.com/manual/current/en/modules/zend.input-filter.intro.html">Zend input filter</a>)</li>
+<li>Special form elements like CSRF tokens (<a href="https://github.com/symfony/security-csrf">Symfony Security CSRF</a>), and
+Captcha elements (<a href="http://framework.zend.com/manual/current/en/modules/zend.captcha.intro.html">Zend CAPTCHA</a>).</li>
+</ul>
+<p>All these dependencies are <em>optional</em> and more adapters can be added to
+provide the same functionality with other components.</p>
+<p>The reason behind this package is that most popular PHP packages (like
+<a href="http://symfony.com/doc/current/components/form/introduction.html">Symfony</a> and <a href="http://framework.zend.com/manual/current/en/modules/zend.form.intro.html">Zend</a>) require you to install several dependencies,
+like translation, validation, and event dispatching packages, even if you
+don't need to use them.</p>
+<p>If you are already using a form component as part of its corresponding framework,
+you probably will not find this package very useful. This package is intended to
+be used when you need a simple integration and you don't need or want to install
+more packages than you already have.</p>
+<h2>Contents</h2>
+<ul>
+<li><a href="#installation">Installation</a></li>
+<li><a href="#usage">Usage</a>
+<ul>
+<li><a href="#form-elements">Form elements</a></li>
+<li><a href="#creating-forms">Creating forms</a></li>
+<li><a href="#validating-forms">Validating forms</a></li>
+<li><a href="#rendering-forms">Rendering forms</a></li>
+<li><a href="#special-form-elements">Special form elements</a>
+<ul>
+<li><a href="#csrf-tokens">CSRF tokens</a></li>
+<li><a href="#captcha-elements">CAPTCHA elements</a></li>
+</ul></li>
+<li><a href="#dynamic-modification">Dynamic modification</a></li>
+<li><a href="#more-examples">More examples</a></li>
+</ul></li>
+<li><a href="#todo">TODO</a></li>
+</ul>
+<h2>Installation</h2>
+<p>Using Composer</p>
+<pre><code class="language-bash">$ composer require comphppuebla/easy-forms:~1.0@dev</code></pre>
+<h2>Usage</h2>
+<h3>Form elements</h3>
+<p>The only required attribute for an element in this package is its name, and
+an optional set of choices.</p>
+<pre><code class="language-php">use EasyForms\Elements;
+
+$name = new Elements\Text('name');
+$password = new Elements\Password('password');
+$userId = new Elements\Hidden('user_id');
+$description = new Elements\TextArea('description');
+$avatar = new Elements\File('avatar');
+$termsAndConditions = new Elements\Checkbox('terms', $checkedValue = 'accept');
+$gender = new Elements\Radio('gender', $choices = [
+    'M' =&gt; 'Male', 'F' =&gt; 'Female'
+]);
+$position = new Elements\Select('position', $choices = [
+    'b'=&gt; 'Backend developer', 'f' =&gt; 'Frontend Developer'
+]);
+$interests = new Elements\MultiCheckbox('interests', $choices = [
+    'u' =&gt; 'Usability', 's' =&gt; 'Security', 't' =&gt; 'Testing'
+]);</code></pre>
+<p>Choices can be omitted in the constructor of elements like <code>Radio</code>, <code>Select</code>,
+and <code>MultiCheckbox</code>, and injected later via the <code>setChoices</code> method.</p>
+<pre><code class="language-php">$gender-&gt;setChoices([
+    'M' =&gt; 'Male', 'F' =&gt; 'Female'
+]);
+$position-&gt;setChoices([
+    'b'=&gt; 'Backend developer', 'f' =&gt; 'Frontend Developer'
+]);
+$interests-&gt;setChoices([
+    'u' =&gt; 'Usability', 's' =&gt; 'Security', 't' =&gt; 'Testing'
+]);</code></pre>
+<p>You can also make elements optional, and pass them error messages.</p>
+<pre><code class="language-php">$description-&gt;makeOptional();
+$password-&gt;setMessages(['Please enter your password']);</code></pre>
+<p>Unlike other form components, elements in this package are not responsible of
+validation and filtering.</p>
+<h3>Creating forms</h3>
+<p>The simplest way to create a form is inheriting from <code>EasyForms\Form</code> and add
+elements to it in its constructor.</p>
+<pre><code class="language-php">class LoginForm extends EasyForms\Form
+{
+    public function __construct()
+    {
+        $this
+            -&gt;add(new EasyForms\Elements\Text('username'))
+            -&gt;add(new EasyForms\Elements\Password('password'))
+        ;
+    }
+}</code></pre>
+<p>However, you could simple create an <code>EasyForms\Form</code> object and start adding
+elements.</p>
+<pre><code class="language-php">$loginForm = new EasyForms\Form();
+$loginForm
+    -&gt;add(new EasyForms\Elements\Text('username'))
+    -&gt;add(new EasyForms\Elements\Password('password'))
+;</code></pre>
+<p>If you add a <code>File</code> element, the form will update its <code>enctype</code> attribute to
+<code>multipart/form-data</code> automatically.</p>
+<p>Notice that when you create a form you only need to know its elements names,
+and its types. You need the names in order to know how to retrieve its values,
+from <code>$_GET</code>, <code>$_POST</code> and <code>$_FILES</code>. You need its types in order to know
+whether an element can have multiple values or not (its value is either a
+string or an array).</p>
+<p>Once you have the form you can populate its values with any of the
+super-globals, populate its error messages, if needed, and pass it to your
+template engine.</p>
+<pre><code class="language-php">$loginForm-&gt;submit(array_merge($_POST, $_FILES));
+$loginForm-&gt;setErrorMessages($errors);
+$view-&gt;render('your-template.html', ['form' =&gt; $loginForm-&gt;buildView()]);</code></pre>
+<p>Both elements and forms have a view representation that exposes the attributes
+that the templates need to render them.</p>
+<pre><code class="language-php">$form-&gt;attributes; // Form's HTML attributes
+$interests = $form-&gt;interests; // Form elements can be accessed through its name
+$interests-&gt;attributes; // Element's HTML attributes
+$interests-&gt;value;
+$interests-&gt;isRequired;
+$interests-&gt;isValid; // true if there's at least 1 error message
+$interests-&gt;messages; // validation messages
+$interests-&gt;choices; // empty if the element is not a subclass of Choice
+$interests-&gt;isSelected('testing') // Helper method for elements with choices</code></pre>
+<h3>Validating forms</h3>
+<p>Another concern related to forms is validation, you could keep on validating and
+sanitizing your form inputs without having to couple validation components to your
+form.</p>
+<p>If you are already using the Zend input filter package, you could validate your
+inputs and pass the error messages to your form so they can be rendered. Suppose
+you have this filter to validate your form.</p>
+<pre><code class="language-php">use Zend\Filter\StringTrim;
+use Zend\InputFilter\Input;
+use Zend\InputFilter\InputFilter;
+use Zend\Validator\NotEmpty;
+use Zend\Validator\StringLength;
+use Zend\Validator\Regex;
+
+class LoginFilter extends InputFilter
+{
+    public function __construct()
+    {
+        $this
+            -&gt;add($this-&gt;buildUsernameInput())
+            -&gt;add($this-&gt;buildPasswordInput())
+        ;
+    }
+
+    protected function buildUsernameInput()
+    {
+        $username = new Input('username');
+        $username
+            -&gt;getValidatorChain()
+            -&gt;attach(new NotEmpty())
+            -&gt;attach(new StringLength([
+                'min' =&gt; 3,
+            ]))
+        ;
+        $username
+            -&gt;getFilterChain()
+            -&gt;attach(new StringTrim())
+        ;
+        return $username;
+    }
+
+    protected function buildPasswordInput()
+    {
+        $password = new Input('password');
+        $password
+            -&gt;getValidatorChain()
+            -&gt;attach(new NotEmpty())
+            -&gt;attach(new StringLength([
+                'min' =&gt; 8,
+            ]))
+        ;
+        return $password;
+    }
+}</code></pre>
+<p>Then, you could validate your form this way:</p>
+<pre><code class="language-php">$form = new LoginForm();
+$filter = new LoginFilter();
+
+$filter-&gt;setData($_POST);
+if (!$filter-&gt;isValid() {
+    $form-&gt;setErrorMessages($filter-&gt;getMessages());
+}
+$form-&gt;submit($filter-&gt;getValues());</code></pre>
+<p>And the form would not be aware of the library that performs the validation. This
+package provides an optional integration in order to encapsulate the behaviour to
+validate form inputs with a Zend input filter.</p>
+<pre><code class="language-php">use EasyForms\Bridges\Zend\InputFilter\InputFilterValidator;
+
+$form = new LoginForm();
+$validator = new InputFilterValidator(new LoginFilter());
+
+$form-&gt;submit($_POST);
+
+// Form would have the errors messages, if needed, and its values would be filtered
+$validator-&gt;validate($form);</code></pre>
+<p>In order to use a different component for validation you would need to write an
+adapter that implements the <code>EasyForms\Validation\FormValidator</code> interface.</p>
+<h3>Rendering forms</h3>
+<p>This package uses Twig and is heavily inspired by the way the Symfony2 form
+component renders a form. Form rendering can be customized through <em>themes</em>. A
+theme is a set of Twig templates which contain <em>blocks</em> to customize the way a
+form element is rendered.</p>
+<p>A form element is rendered in three parts:</p>
+<ul>
+<li>A label</li>
+<li>The HTML element</li>
+<li>Its error messages, if any</li>
+</ul>
+<p>This package has 2 built-in themes:</p>
+<ul>
+<li>The default layout, which groups form elements in divs</li>
+<li>The Bootstrap 3 layout which extends the default layout</li>
+</ul>
+<p>In order to use the themes you have to register the <code>FormExtension</code> provided in
+this package.</p>
+<pre><code class="language-php">use EasyForms\Bridges\Twig\BlockOptions;
+use EasyForms\Bridges\Twig\FormExtension;
+use EasyForms\Bridges\Twig\FormRenderer;
+use EasyForms\Bridges\Twig\FormTheme;
+
+$loader = new Twig_Loader([
+    // Path to themes
+    'vendor/comphppuebla/easy-forms/src/EasyForms/Bridges/Twig',
+    'path/to/your/application/templates',
+]);
+$twig = new Twig_Environment($loader);
+// use the Bootstrap 3 layout
+$renderer = new FormRenderer(
+    new FormTheme($twig, 'layouts/bootstrap.html.twig'),
+    new BlockOptions()
+);
+$twig-&gt;addExtension(new FormExtension($renderer));</code></pre>
+<p>Once you have the form extension configured, you can pass your form to any Twig
+template.</p>
+<pre><code class="language-php">$view-&gt;render('user/login.html.twig', [
+    'form' =&gt; $loginForm-&gt;buildView(),
+]);</code></pre>
+<p>The extension defines some functions, among the most important are <code>form_start</code>,
+<code>form_end</code>, and <code>element_row</code>.</p>
+<p>The <code>element_row</code> defines 2 parameters, the form element, and an associative array
+of options. The options are not mandatory, and can be explained as follows:</p>
+<ul>
+<li><code>label</code>. The element 's label</li>
+<li><code>label_attr</code>. The label's HTML attributes</li>
+<li><code>attr</code>. The elements HTML  attributes</li>
+<li><code>options</code>. This one is used mainly to override the default blocks that render the
+elements (label, element and error messages, among others).</li>
+</ul>
+<p>In the following example we use the options to define the elements labels, and its
+HTML IDs which could be used for client side validation, for instance.</p>
+<pre><code class="language-twig">{{ form_start(login) }}
+{{ element_row(login.username, {'label': 'Username', 'attr': {'id': 'username'}}) }}
+{{ element_row(login.password, {'label': 'Password', 'attr': {'id': 'password'}}) }}
+&lt;button type="submit" class="btn btn-default"&gt;
+    &lt;span class="glyphicon glyphicon-home"&gt;&lt;/span&gt; Login
+&lt;/button&gt;
+{{ form_end() }}</code></pre>
+<p>If you want to display a form element in a different way in only one template, you
+need to do 3 things:</p>
+<ol>
+<li>Add the template that renders the form to the current theme</li>
+<li>Define a custom block for your element</li>
+<li>Override the block in the <code>options</code> parameter when calling <code>element_row</code></li>
+</ol>
+<p>Suppose you have a <code>ProductForm</code> class with 3 form elements, a text element with the
+name of the product, a text area with an optional description, and another text
+element to enter a unit price. To add the current template to the theme you will need
+to use the <code>form_theme</code> token and pass the value <code>self</code> as argument, you can add more
+than one template this way, therefore the value should be inside an array.</p>
+<pre><code class="language-twig">{# Add this template to the theme #}
+{% form_theme [_self] %}
+
+{# Custom block #}
+{%- block money -%}
+    &lt;div class="input-group"&gt;&lt;div class="input-group-addon"&gt;$&lt;/div&gt;
+        {%- set options = options|merge({'block': 'input'}) -%}
+        {{- element(element, attr, options) -}}
+    &lt;div class="input-group-addon"&gt;.00&lt;/div&gt;&lt;/div&gt;
+{%- endblock money -%}
+
+{{ form_start(form) }}
+{{ element_row(form.name, {'label': 'Name', 'attr': {'id': 'name'}}) }}
+
+{# Override the element's default block, use 'money' instead #}
+{{ element_row(form.unitPrice, {'label': 'Price', 'options': {'block': 'money'}}) }}
+
+&lt;button type="submit" class="btn btn-default"&gt;
+    &lt;span class="glyphicon glyphicon-th-list"&gt;&lt;/span&gt; Add to catalog
+&lt;/button&gt;
+{{ form_end() }}</code></pre>
+<h3>Special form elements</h3>
+<h4>CSRF tokens</h4>
+<p>In order to protect your application from Cross Site Request Forgery (CSRF) attacks
+you can generate and validate secret tokens and include them in your forms. This
+package integrates the Symfony Security CSRF package to do that task.</p>
+<p>Let's add a CSRF token to the <code>LoginForm</code> used in previous examples.</p>
+<pre><code class="language-php">use EasyForms\Elements\Csrf\TokenProvider;
+use EasyForms\Elements\Text;
+use EasyForms\Elements\Password;
+use EasyForms\Elements\Csrf;
+use EasyForms\Form;
+
+class LoginForm extends Form
+{
+    public function __construct(TokenProvider $csrfTokenProvider)
+    {
+        $this
+            -&gt;add(new Text('username'))
+            -&gt;add(new Password('password'))
+            -&gt;add(new Csrf('csrf_token', '_login_csrf_token', $csrfTokenProvider))
+        ;
+    }
+}</code></pre>
+<p>A <code>Csrf</code> form element requires a name (as any element) an identifier for the token
+and a <code>TokenProvider</code> object. We can configure a Symfony2 token provider as follows:</p>
+<pre><code class="language-php">use EasyForms\Bridges\SymfonyCsrf\CsrfTokenProvider;
+use Symfony\Component\Security\Csrf\CsrfTokenManager;
+use Symfony\Component\Security\Csrf\TokenGenerator\UriSafeTokenGenerator;
+use Symfony\Component\Security\Csrf\TokenStorage\NativeSessionTokenStorage;
+
+$loginform = new LoginForm(new CsrfTokenProvider(
+   new CsrfTokenManager(new UriSafeTokenGenerator(), new NativeSessionTokenStorage())
+));</code></pre>
+<p>You could validate the token adding a validator to the <code>LoginFilter</code> object showed in
+previous examples.</p>
+<pre><code class="language-php">use EasyForms\Bridges\Zend\InputFilter\Validator\CsrfValidator;
+use EasyForms\Elements\Csrf\TokenProvider;
+use Zend\InputFilter\Input;
+use Zend\InputFilter\InputFilter;
+
+class LoginFilter extends InputFilter
+{
+    public function __construct(TokenProvider $tokenProvider)
+    {
+        $this
+            /* ... */
+            -&gt;add($this-&gt;buildCsrfInput($tokenProvider))
+        ;
+    }
+
+    /* ... */
+
+    protected function buildCsrfInput(TokenProvider $tokenProvider)
+    {
+        $csrf = new Input('csrf_token');
+        $csrf-&gt;setContinueIfEmpty(true);
+        $csrf
+            -&gt;getValidatorChain()
+            -&gt;attach(new CsrfValidator([
+                'tokenProvider' =&gt; $tokenProvider,
+                'tokenId' =&gt; '_login_csrf_token',
+                'updateToken' =&gt; true,
+            ]))
+        ;
+
+        return $csrf;
+    }
+}</code></pre>
+<p>Now you could validate your form as usual. Note that this form element does not
+require special treatment in the template since it is a simple <code>hidden</code> element.</p>
+<h4>CAPTCHA elements</h4>
+<p>This package allows you to add CAPTCHA elements to your forms using the Zend
+CAPTCHA package.</p>
+<p>Suppose you have a form to post comments to a Blog that you want to protect against
+SPAM. The form could look like the following:</p>
+<pre><code class="language-php">use EasyForms\Elements\Captcha;
+use EasyForms\Elements\Captcha\CaptchaAdapter;
+use EasyForms\Elements\TextArea;
+use EasyForms\Form;
+
+class CommentForm extends Form
+{
+    public function __construct(CaptchaAdapter $adapter)
+    {
+        $this
+            -&gt;add(new TextArea('message'))
+            -&gt;add(new Captcha('captcha', $adapter))
+        ;
+    }
+}</code></pre>
+<p>Similar to the way a CSRF token element is configured, a CAPTCHA element requires
+an adapter. The current implementation allows you to use images as challenges and
+the ReCAPTCHA service. Let's create a ReCAPTCHA adapter in our example.</p>
+<pre><code class="language-php">use EasyForms\Bridges\Zend\Captcha\ReCaptchaAdapter;
+use Zend\Captcha\ReCaptcha;
+use Zend\Http\Client;
+use ZendService\ReCaptcha\ReCaptcha as ReCaptchaService;
+
+$reCaptcha = new ReCaptchaAdapter(new ReCaptcha([
+    'service' =&gt; new ReCaptchaService(
+        'xxx',
+        'yyy',
+        $params = null,
+        $options = null,
+        $ip = null,
+        new Client($uri = null, ['adapter' =&gt; new Client\Adapter\Curl()])
+    )
+]));
+$commentForm = new CommentForm($reCaptcha));</code></pre>
+<p>In order to render the captcha we have to add a new template to the current theme.
+Let's assume we are using the Bootstrap 3 theme</p>
+<pre><code class="language-twig">{% form_theme ['layouts/captcha-bootstrap3.html.twig'] %}
+
+{{ form_start(comment) }}
+{{ element_row(comment.message, {'label': 'Share your opinion'}) }}
+
+{{ element_row(comment.captcha, {'label': 'Type the words in the image below'}) }}
+
+&lt;button type="submit" class="btn btn-default"&gt;
+    &lt;span class="glyphicon glyphicon-comment"&gt;&lt;/span&gt; Comment
+&lt;/button&gt;
+{{ form_end() }}</code></pre>
+<p>The blocks for this element are not included by default in the main themes since
+not all of your forms will need a CAPTCHA element.</p>
+<h3>Dynamic modification</h3>
+<p>Most of the times your forms will need to be populated with information from a
+database, or they will need to add/remove/modify elements and validators depending
+on the values provided by the user.</p>
+<p>For this kind of tasks Symfony2 uses events, Zend form uses its <a href="http://framework.zend.com/manual/current/en/modules/zend.stdlib.hydrator.html">Hydrator</a>
+package. This package offers no mechanisms to do these tasks, so you can use
+whatever you need or prefer.</p>
+<p>Suppose you have a form to add products to a shopping cart in an e-commerce
+application.</p>
+<pre><code class="language-php">use EasyForms\Elements\Select;
+use EasyForms\Elements\Text;
+use EasyForms\Form;
+
+class AddToCartForm extends Form
+{
+    public function __construct()
+    {
+        $this
+            -&gt;add(new Select('product'))
+            -&gt;add(new Text('quantity'))
+        ;
+    }
+}</code></pre>
+<p>You will want to populate the <code>select</code> element choices with the products from
+your database. We will use a configuration object to populate our form element.
+In this example the <code>ProductsCatalog</code> class is a repository and the
+<code>ProductInformation</code> class is a DTO.</p>
+<pre><code class="language-php">class AddToCartConfiguration
+{
+    protected $catalog;
+
+    public function __construct(ProductsCatalog $catalog)
+    {
+        $this-&gt;catalog = $catalog;
+    }
+
+    public function getProductOptions()
+    {
+        $options = [];
+        array_map(function (ProductInformation $product) use (&amp;$options) {
+            $options[$product-&gt;id] = "{$product-&gt;name}, \${$product-&gt;price}";
+        }, $this-&gt;catalog-&gt;all());
+
+        return $options;
+    }
+}</code></pre>
+<p>Then we would have to add a method to our form to use the information provided by
+this configuration object.</p>
+<pre><code class="language-php">use EasyForms\Elements\Select;
+
+class AddToCartForm extends Form
+{
+    /* ... */
+
+    public function configure(AddToCartConfiguration $configuration)
+    {
+        /** @var Select $product */
+        $product = $this-&gt;get('product');
+
+        $product-&gt;setChoices($configuration-&gt;getProductOptions());
+    }
+}</code></pre>
+<p>We would configure our form the following way:</p>
+<pre><code class="language-php">$addToCartForm = new AddToCartForm();
+$addToCartForm-&gt;configure(new AddToCartConfiguration(new ProductsCatalog()));</code></pre>
+<p>We would have to update this form's validator dynamically too, in order to
+pass the valid products that a user can sent through this form to it.</p>
+<pre><code class="language-php">use Zend\Filter\Int;
+use Zend\InputFilter\Input;
+use Zend\InputFilter\InputFilter;
+use Zend\Validator\Digits;
+use Zend\Validator\InArray;
+use Zend\Validator\NotEmpty;
+
+class AddToCartFilter extends InputFilter
+{
+    public function __construct()
+    {
+        $this-&gt;add($this-&gt;buildProductInput());
+        $this-&gt;add($this-&gt;buildQuantityInput());
+    }
+
+    public function configure(AddToCartConfiguration $configuration)
+    {
+        $product = $this-&gt;get('product');
+        $product
+            -&gt;getValidatorChain()
+            -&gt;attach(new InArray([
+                'haystack' =&gt; $configuration-&gt;getProductsIds(),
+            ]))
+        ;
+    }
+
+    protected function buildProductInput()
+    {
+        $product = new Input('product');
+        $product
+            -&gt;getValidatorChain()
+            -&gt;attach(new NotEmpty())
+        ;
+        $product
+            -&gt;getFilterChain()
+            -&gt;attach(new Int())
+        ;
+        return $product;
+    }
+
+    protected function buildQuantityInput()
+    {
+        $quantity = new Input('quantity');
+        $quantity
+            -&gt;getValidatorChain()
+            -&gt;attach(new NotEmpty())
+            -&gt;attach(new Digits())
+        ;
+        $quantity
+            -&gt;getFilterChain()
+            -&gt;attach(new Int())
+        ;
+        return $quantity;
+    }
+}</code></pre>
+<p>The configuration object would have to get the valid products IDs that the <code>InArray</code>
+validator will use.</p>
+<pre><code class="language-php">class AddToCartConfiguration
+{
+    /* ... */
+
+    public function getProductsIds()
+    {
+        return array_keys($this-&gt;getProductOptions());
+    }
+}</code></pre>
+<p>Then we could configure the filter as follows:</p>
+<pre><code class="language-php">$filter = new AddToCartFilter();
+$filter-&gt;configure(new AddToCartConfiguration(new ProductsCatalog()));</code></pre>
+<p>As you have seen through the examples, forms do not need to know how to modify
+themselves dynamically, reason why this library does not provide any mechanisms
+for such tasks.</p>
+<h3>More examples</h3>
+<p>You can find some working examples in a small Slim application in this
+<a href="https://github.com/MontealegreLuis/easy-forms-examples">repository</a>.</p>
+<h2>TODO</h2>
+<ul>
+<li>Provide alternative implementations, for instance: validation with the Symfony
+2 validation component.</li>
+</ul>
+                </section>
+
+            </div>
+        </main>
+
+        <footer>
+            <div class="container">
+                <p class="text-muted">
+                    website generated with <a href="http://couscous.io" title="Markdown website generator">Couscous</a>
+                </p>
+            </div>
+        </footer>
+
+        <script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
+        <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+        <script src="http://yastatic.net/highlightjs/8.2/highlight.min.js"></script>
+
+        <script>
+            $(function() {
+                $("section>h1").wrap('<div class="page-header" />');
+                // Syntax highlighting
+                hljs.initHighlightingOnLoad();
+            });
+        </script>
+
+    </body>
+</html>

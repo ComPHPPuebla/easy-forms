@@ -1,6 +1,9 @@
 # Easy form handling for PHP
 
 [![Build Status](https://travis-ci.org/ComPHPPuebla/easy-forms.svg?branch=master)](https://travis-ci.org/ComPHPPuebla/easy-forms)
+[![Latest Stable Version](https://poser.pugx.org/comphppuebla/easy-forms/v/stable.svg)](https://packagist.org/packages/comphppuebla/easy-forms)
+[![Latest Unstable Version](https://poser.pugx.org/comphppuebla/easy-forms/v/unstable.svg)](https://packagist.org/packages/comphppuebla/easy-forms)
+[![License](https://poser.pugx.org/comphppuebla/easy-forms/license.svg)](https://packagist.org/packages/comphppuebla/easy-forms)
 [![SensioLabsInsight](https://insight.sensiolabs.com/projects/b21b5fac-a347-4c1a-b9b0-9965a93893ea/mini.png)](https://insight.sensiolabs.com/projects/b21b5fac-a347-4c1a-b9b0-9965a93893ea)
 
 This is a light library to process HTML forms in Web applications. Its main
@@ -16,7 +19,7 @@ following functionality.
 Captcha elements ([Zend CAPTCHA][6]).
 
 All these dependencies are *optional* and more adapters can be added to
-provide the same functionality with other components.
+provide the same functionality with other libraries.
 
 The reason behind this package is that most popular PHP packages (like
 [Symfony][1] and [Zend][2]) require you to install several dependencies,
@@ -33,6 +36,22 @@ more packages than you already have.
 You can find some working examples in a small Slim application in this
 [repository][7].
 
+## Unit Tests
+
+Setup the test suite using Composer:
+
+```bash
+$ composer install --dev
+```
+
+Run it using PHPUnit and PHPSpec:
+
+```bash
+$ php bin/phpunit --testdox && php bin/phpspec run
+ ```
+## License
+
+`EasyForms` is released under the MIT License.
 
 [1]: http://symfony.com/doc/current/components/form/introduction.html
 [2]: http://framework.zend.com/manual/current/en/modules/zend.form.intro.html

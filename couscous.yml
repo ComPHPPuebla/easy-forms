@@ -1,3 +1,35 @@
 title: Easy form handling for PHP
 subTitle: Decoupled form processing
 baseUrl: http://ComPHPPuebla.github.io/easy-forms
+template:
+  url: https://github.com/CouscousPHP/Template-Dark
+
+menu:
+  sections:
+    main:
+      name: Easy Form
+      items:
+        installation:
+          text: Installation
+          relativeUrl: docs/installation.html
+        elements:
+          text: Creating form elements
+          relativeUrl: docs/creating-elements.html
+        forms:
+          text: Creating forms
+          relativeUrl: docs/creating-forms.html
+        validation:
+          text: Validating forms
+          relativeUrl: docs/validating-forms.html
+        rendering:
+          text: Rendering forms
+          relativeUrl: docs/rendering-forms.html
+        csrf:
+          text: CSRF tokens
+          relativeUrl: docs/csrf-tokens.html
+        captcha:
+          text: CAPTCHA elements
+          relativeUrl: docs/captcha-elements.html
+        dynamic:
+            text: Dynamic modification
+            relativeUrl: docs/dynamic-modification.html

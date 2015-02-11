@@ -82,33 +82,99 @@
 
                 
                 <section class="col-sm-offset-3 col-lg-offset-2 col-sm-9 col-lg-10">
-                    <h1>Easy form handling for PHP</h1>
-<p><a href="https://travis-ci.org/ComPHPPuebla/easy-forms"><img src="https://travis-ci.org/ComPHPPuebla/easy-forms.svg?branch=master" alt="Build Status" /></a>
-<a href="https://insight.sensiolabs.com/projects/b21b5fac-a347-4c1a-b9b0-9965a93893ea"><img src="https://insight.sensiolabs.com/projects/b21b5fac-a347-4c1a-b9b0-9965a93893ea/mini.png" alt="SensioLabsInsight" /></a></p>
-<p>This is a light library to process HTML forms in Web applications. Its main
-goal is to delegate concerns like, validation, rendering, translation, and
-dynamic modification/population to well-known components.</p>
-<p>This package is intended to be used as a glue for packages that provide the
-following functionality.</p>
+                    <h1>Rendering forms</h1>
+<p>This package uses Twig and is heavily inspired by the way the Symfony2 form
+component renders a form. Form rendering can be customized through <em>themes</em>. A
+theme is a set of Twig templates which contain <em>blocks</em> to customize the way a
+form element is rendered.</p>
+<p>A form element is rendered in three parts:</p>
 <ul>
-<li>Rendering (<a href="http://twig.sensiolabs.org/">Twig</a>)</li>
-<li>Validation (<a href="http://framework.zend.com/manual/current/en/modules/zend.input-filter.intro.html">Zend input filter</a>)</li>
-<li>Special form elements like CSRF tokens (<a href="https://github.com/symfony/security-csrf">Symfony Security CSRF</a>), and
-Captcha elements (<a href="http://framework.zend.com/manual/current/en/modules/zend.captcha.intro.html">Zend CAPTCHA</a>).</li>
+<li>A label</li>
+<li>The HTML element</li>
+<li>Its error messages, if any</li>
 </ul>
-<p>All these dependencies are <em>optional</em> and more adapters can be added to
-provide the same functionality with other components.</p>
-<p>The reason behind this package is that most popular PHP packages (like
-<a href="http://symfony.com/doc/current/components/form/introduction.html">Symfony</a> and <a href="http://framework.zend.com/manual/current/en/modules/zend.form.intro.html">Zend</a>) require you to install several dependencies,
-like translation, validation, and event dispatching packages, even if you
-don't need to use them.</p>
-<p>If you are already using a form component as part of its corresponding framework,
-you probably will not find this package very useful. This package is intended to
-be used when you need a simple integration and you don't need or want to install
-more packages than you already have.</p>
-<h2>Examples</h2>
-<p>You can find some working examples in a small Slim application in this
-<a href="https://github.com/MontealegreLuis/easy-forms-examples">repository</a>.</p>
+<p>This package has 2 built-in themes:</p>
+<ul>
+<li>The default layout, which groups form elements in divs</li>
+<li>The Bootstrap 3 layout which extends the default layout</li>
+</ul>
+<p>In order to use the themes you have to register the <code>FormExtension</code> provided in
+this package.</p>
+<pre><code class="language-php">use EasyForms\Bridges\Twig\BlockOptions;
+use EasyForms\Bridges\Twig\FormExtension;
+use EasyForms\Bridges\Twig\FormRenderer;
+use EasyForms\Bridges\Twig\FormTheme;
+
+$loader = new Twig_Loader([
+    // Path to themes
+    'vendor/comphppuebla/easy-forms/src/EasyForms/Bridges/Twig',
+    'path/to/your/application/templates',
+]);
+$twig = new Twig_Environment($loader);
+// use the Bootstrap 3 layout
+$renderer = new FormRenderer(
+    new FormTheme($twig, 'layouts/bootstrap.html.twig'),
+    new BlockOptions()
+);
+$twig-&gt;addExtension(new FormExtension($renderer));</code></pre>
+<p>Once you have the form extension configured, you can pass your form to any Twig
+template.</p>
+<pre><code class="language-php">$view-&gt;render('user/login.html.twig', [
+    'form' =&gt; $loginForm-&gt;buildView(),
+]);</code></pre>
+<p>The extension defines some functions, among the most important are <code>form_start</code>,
+<code>form_end</code>, and <code>element_row</code>.</p>
+<p>The <code>element_row</code> defines 2 parameters, the form element, and an associative array
+of options. The options are not mandatory, and can be explained as follows:</p>
+<ul>
+<li><code>label</code>. The element 's label</li>
+<li><code>label_attr</code>. The label's HTML attributes</li>
+<li><code>attr</code>. The elements HTML  attributes</li>
+<li><code>options</code>. This one is used mainly to override the default blocks that render the
+elements (label, element and error messages, among others).</li>
+</ul>
+<p>In the following example we use the options to define the elements labels, and its
+HTML IDs which could be used for client side validation, for instance.</p>
+<pre><code class="language-twig">{{ form_start(login) }}
+{{ element_row(login.username, {'label': 'Username', 'attr': {'id': 'username'}}) }}
+{{ element_row(login.password, {'label': 'Password', 'attr': {'id': 'password'}}) }}
+&lt;button type="submit" class="btn btn-default"&gt;
+    &lt;span class="glyphicon glyphicon-home"&gt;&lt;/span&gt; Login
+&lt;/button&gt;
+{{ form_end() }}</code></pre>
+<p>If you want to display a form element in a different way in only one template, you
+need to do 3 things:</p>
+<ol>
+<li>Add the template that renders the form to the current theme</li>
+<li>Define a custom block for your element</li>
+<li>Override the block in the <code>options</code> parameter when calling <code>element_row</code></li>
+</ol>
+<p>Suppose you have a <code>ProductForm</code> class with 3 form elements, a text element with the
+name of the product, a text area with an optional description, and another text
+element to enter a unit price. To add the current template to the theme you will need
+to use the <code>form_theme</code> token and pass the value <code>self</code> as argument, you can add more
+than one template this way, therefore the value should be inside an array.</p>
+<pre><code class="language-twig">{# Add this template to the theme #}
+{% form_theme [_self] %}
+
+{# Custom block #}
+{%- block money -%}
+    &lt;div class="input-group"&gt;&lt;div class="input-group-addon"&gt;$&lt;/div&gt;
+        {%- set options = options|merge({'block': 'input'}) -%}
+        {{- element(element, attr, options) -}}
+    &lt;div class="input-group-addon"&gt;.00&lt;/div&gt;&lt;/div&gt;
+{%- endblock money -%}
+
+{{ form_start(form) }}
+{{ element_row(form.name, {'label': 'Name', 'attr': {'id': 'name'}}) }}
+
+{# Override the element's default block, use 'money' instead #}
+{{ element_row(form.unitPrice, {'label': 'Price', 'options': {'block': 'money'}}) }}
+
+&lt;button type="submit" class="btn btn-default"&gt;
+    &lt;span class="glyphicon glyphicon-th-list"&gt;&lt;/span&gt; Add to catalog
+&lt;/button&gt;
+{{ form_end() }}</code></pre>
                 </section>
 
             </div>

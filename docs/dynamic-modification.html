@@ -82,33 +82,145 @@
 
                 
                 <section class="col-sm-offset-3 col-lg-offset-2 col-sm-9 col-lg-10">
-                    <h1>Easy form handling for PHP</h1>
-<p><a href="https://travis-ci.org/ComPHPPuebla/easy-forms"><img src="https://travis-ci.org/ComPHPPuebla/easy-forms.svg?branch=master" alt="Build Status" /></a>
-<a href="https://insight.sensiolabs.com/projects/b21b5fac-a347-4c1a-b9b0-9965a93893ea"><img src="https://insight.sensiolabs.com/projects/b21b5fac-a347-4c1a-b9b0-9965a93893ea/mini.png" alt="SensioLabsInsight" /></a></p>
-<p>This is a light library to process HTML forms in Web applications. Its main
-goal is to delegate concerns like, validation, rendering, translation, and
-dynamic modification/population to well-known components.</p>
-<p>This package is intended to be used as a glue for packages that provide the
-following functionality.</p>
-<ul>
-<li>Rendering (<a href="http://twig.sensiolabs.org/">Twig</a>)</li>
-<li>Validation (<a href="http://framework.zend.com/manual/current/en/modules/zend.input-filter.intro.html">Zend input filter</a>)</li>
-<li>Special form elements like CSRF tokens (<a href="https://github.com/symfony/security-csrf">Symfony Security CSRF</a>), and
-Captcha elements (<a href="http://framework.zend.com/manual/current/en/modules/zend.captcha.intro.html">Zend CAPTCHA</a>).</li>
-</ul>
-<p>All these dependencies are <em>optional</em> and more adapters can be added to
-provide the same functionality with other components.</p>
-<p>The reason behind this package is that most popular PHP packages (like
-<a href="http://symfony.com/doc/current/components/form/introduction.html">Symfony</a> and <a href="http://framework.zend.com/manual/current/en/modules/zend.form.intro.html">Zend</a>) require you to install several dependencies,
-like translation, validation, and event dispatching packages, even if you
-don't need to use them.</p>
-<p>If you are already using a form component as part of its corresponding framework,
-you probably will not find this package very useful. This package is intended to
-be used when you need a simple integration and you don't need or want to install
-more packages than you already have.</p>
-<h2>Examples</h2>
-<p>You can find some working examples in a small Slim application in this
-<a href="https://github.com/MontealegreLuis/easy-forms-examples">repository</a>.</p>
+                    <h1>Dynamic modification</h1>
+<p>Most of the times your forms will need to be populated with information from a
+database, or they will need to add/remove/modify elements and validators depending
+on the values provided by the user.</p>
+<p>For this kind of tasks Symfony2 uses events, Zend form uses its <a href="http://framework.zend.com/manual/current/en/modules/zend.stdlib.hydrator.html">Hydrator</a>
+package. This package offers no mechanisms to do these tasks, so you can use
+whatever you need or prefer.</p>
+<p>Suppose you have a form to add products to a shopping cart in an e-commerce
+application.</p>
+<pre><code class="language-php">use EasyForms\Elements\Select;
+use EasyForms\Elements\Text;
+use EasyForms\Form;
+
+class AddToCartForm extends Form
+{
+    public function __construct()
+    {
+        $this
+            -&gt;add(new Select('product'))
+            -&gt;add(new Text('quantity'))
+        ;
+    }
+}</code></pre>
+<p>You will want to populate the <code>select</code> element choices with the products from
+your database. We will use a configuration object to populate our form element.
+In this example the <code>ProductsCatalog</code> class is a repository and the
+<code>ProductInformation</code> class is a DTO.</p>
+<pre><code class="language-php">class AddToCartConfiguration
+{
+    protected $catalog;
+
+    public function __construct(ProductsCatalog $catalog)
+    {
+        $this-&gt;catalog = $catalog;
+    }
+
+    public function getProductOptions()
+    {
+        $options = [];
+        array_map(function (ProductInformation $product) use (&amp;$options) {
+            $options[$product-&gt;id] = "{$product-&gt;name}, \${$product-&gt;price}";
+        }, $this-&gt;catalog-&gt;all());
+
+        return $options;
+    }
+}</code></pre>
+<p>Then we would have to add a method to our form to use the information provided by
+this configuration object.</p>
+<pre><code class="language-php">use EasyForms\Elements\Select;
+
+class AddToCartForm extends Form
+{
+    /* ... */
+
+    public function configure(AddToCartConfiguration $configuration)
+    {
+        /** @var Select $product */
+        $product = $this-&gt;get('product');
+
+        $product-&gt;setChoices($configuration-&gt;getProductOptions());
+    }
+}</code></pre>
+<p>We would configure our form the following way:</p>
+<pre><code class="language-php">$addToCartForm = new AddToCartForm();
+$addToCartForm-&gt;configure(new AddToCartConfiguration(new ProductsCatalog()));</code></pre>
+<p>We would have to update this form's validator dynamically too, in order to
+pass the valid products that a user can sent through this form to it.</p>
+<pre><code class="language-php">use Zend\Filter\Int;
+use Zend\InputFilter\Input;
+use Zend\InputFilter\InputFilter;
+use Zend\Validator\Digits;
+use Zend\Validator\InArray;
+use Zend\Validator\NotEmpty;
+
+class AddToCartFilter extends InputFilter
+{
+    public function __construct()
+    {
+        $this-&gt;add($this-&gt;buildProductInput());
+        $this-&gt;add($this-&gt;buildQuantityInput());
+    }
+
+    public function configure(AddToCartConfiguration $configuration)
+    {
+        $product = $this-&gt;get('product');
+        $product
+            -&gt;getValidatorChain()
+            -&gt;attach(new InArray([
+                'haystack' =&gt; $configuration-&gt;getProductsIds(),
+            ]))
+        ;
+    }
+
+    protected function buildProductInput()
+    {
+        $product = new Input('product');
+        $product
+            -&gt;getValidatorChain()
+            -&gt;attach(new NotEmpty())
+        ;
+        $product
+            -&gt;getFilterChain()
+            -&gt;attach(new Int())
+        ;
+        return $product;
+    }
+
+    protected function buildQuantityInput()
+    {
+        $quantity = new Input('quantity');
+        $quantity
+            -&gt;getValidatorChain()
+            -&gt;attach(new NotEmpty())
+            -&gt;attach(new Digits())
+        ;
+        $quantity
+            -&gt;getFilterChain()
+            -&gt;attach(new Int())
+        ;
+        return $quantity;
+    }
+}</code></pre>
+<p>The configuration object would have to get the valid products IDs that the <code>InArray</code>
+validator will use.</p>
+<pre><code class="language-php">class AddToCartConfiguration
+{
+    /* ... */
+
+    public function getProductsIds()
+    {
+        return array_keys($this-&gt;getProductOptions());
+    }
+}</code></pre>
+<p>Then we could configure the filter as follows:</p>
+<pre><code class="language-php">$filter = new AddToCartFilter();
+$filter-&gt;configure(new AddToCartConfiguration(new ProductsCatalog()));</code></pre>
+<p>As you have seen through the examples, forms do not need to know how to modify
+themselves dynamically, reason why this library does not provide any mechanisms
+for such tasks.</p>
                 </section>
 
             </div>

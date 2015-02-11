@@ -82,33 +82,60 @@
 
                 
                 <section class="col-sm-offset-3 col-lg-offset-2 col-sm-9 col-lg-10">
-                    <h1>Easy form handling for PHP</h1>
-<p><a href="https://travis-ci.org/ComPHPPuebla/easy-forms"><img src="https://travis-ci.org/ComPHPPuebla/easy-forms.svg?branch=master" alt="Build Status" /></a>
-<a href="https://insight.sensiolabs.com/projects/b21b5fac-a347-4c1a-b9b0-9965a93893ea"><img src="https://insight.sensiolabs.com/projects/b21b5fac-a347-4c1a-b9b0-9965a93893ea/mini.png" alt="SensioLabsInsight" /></a></p>
-<p>This is a light library to process HTML forms in Web applications. Its main
-goal is to delegate concerns like, validation, rendering, translation, and
-dynamic modification/population to well-known components.</p>
-<p>This package is intended to be used as a glue for packages that provide the
-following functionality.</p>
-<ul>
-<li>Rendering (<a href="http://twig.sensiolabs.org/">Twig</a>)</li>
-<li>Validation (<a href="http://framework.zend.com/manual/current/en/modules/zend.input-filter.intro.html">Zend input filter</a>)</li>
-<li>Special form elements like CSRF tokens (<a href="https://github.com/symfony/security-csrf">Symfony Security CSRF</a>), and
-Captcha elements (<a href="http://framework.zend.com/manual/current/en/modules/zend.captcha.intro.html">Zend CAPTCHA</a>).</li>
-</ul>
-<p>All these dependencies are <em>optional</em> and more adapters can be added to
-provide the same functionality with other components.</p>
-<p>The reason behind this package is that most popular PHP packages (like
-<a href="http://symfony.com/doc/current/components/form/introduction.html">Symfony</a> and <a href="http://framework.zend.com/manual/current/en/modules/zend.form.intro.html">Zend</a>) require you to install several dependencies,
-like translation, validation, and event dispatching packages, even if you
-don't need to use them.</p>
-<p>If you are already using a form component as part of its corresponding framework,
-you probably will not find this package very useful. This package is intended to
-be used when you need a simple integration and you don't need or want to install
-more packages than you already have.</p>
-<h2>Examples</h2>
-<p>You can find some working examples in a small Slim application in this
-<a href="https://github.com/MontealegreLuis/easy-forms-examples">repository</a>.</p>
+                    <h1>CAPTCHA elements</h1>
+<p>This package allows you to add CAPTCHA elements to your forms using the Zend
+CAPTCHA package.</p>
+<p>Suppose you have a form to post comments to a Blog that you want to protect against
+SPAM. The form could look like the following:</p>
+<pre><code class="language-php">use EasyForms\Elements\Captcha;
+use EasyForms\Elements\Captcha\CaptchaAdapter;
+use EasyForms\Elements\TextArea;
+use EasyForms\Form;
+
+class CommentForm extends Form
+{
+    public function __construct(CaptchaAdapter $adapter)
+    {
+        $this
+            -&gt;add(new TextArea('message'))
+            -&gt;add(new Captcha('captcha', $adapter))
+        ;
+    }
+}</code></pre>
+<p>Similar to the way a CSRF token element is configured, a CAPTCHA element requires
+an adapter. The current implementation allows you to use images as challenges and
+the ReCAPTCHA service. Let's create a ReCAPTCHA adapter in our example.</p>
+<pre><code class="language-php">use EasyForms\Bridges\Zend\Captcha\ReCaptchaAdapter;
+use Zend\Captcha\ReCaptcha;
+use Zend\Http\Client;
+use ZendService\ReCaptcha\ReCaptcha as ReCaptchaService;
+
+$reCaptcha = new ReCaptchaAdapter(new ReCaptcha([
+    'service' =&gt; new ReCaptchaService(
+        'xxx',
+        'yyy',
+        $params = null,
+        $options = null,
+        $ip = null,
+        new Client($uri = null, ['adapter' =&gt; new Client\Adapter\Curl()])
+    )
+]));
+$commentForm = new CommentForm($reCaptcha));</code></pre>
+<p>In order to render the captcha we have to add a new template to the current theme.
+Let's assume we are using the Bootstrap 3 theme</p>
+<pre><code class="language-twig">{% form_theme ['layouts/captcha-bootstrap3.html.twig'] %}
+
+{{ form_start(comment) }}
+{{ element_row(comment.message, {'label': 'Share your opinion'}) }}
+
+{{ element_row(comment.captcha, {'label': 'Type the words in the image below'}) }}
+
+&lt;button type="submit" class="btn btn-default"&gt;
+    &lt;span class="glyphicon glyphicon-comment"&gt;&lt;/span&gt; Comment
+&lt;/button&gt;
+{{ form_end() }}</code></pre>
+<p>The blocks for this element are not included by default in the main themes since
+not all of your forms will need a CAPTCHA element.</p>
                 </section>
 
             </div>

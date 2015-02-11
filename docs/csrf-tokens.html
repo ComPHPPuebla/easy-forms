@@ -82,33 +82,75 @@
 
                 
                 <section class="col-sm-offset-3 col-lg-offset-2 col-sm-9 col-lg-10">
-                    <h1>Easy form handling for PHP</h1>
-<p><a href="https://travis-ci.org/ComPHPPuebla/easy-forms"><img src="https://travis-ci.org/ComPHPPuebla/easy-forms.svg?branch=master" alt="Build Status" /></a>
-<a href="https://insight.sensiolabs.com/projects/b21b5fac-a347-4c1a-b9b0-9965a93893ea"><img src="https://insight.sensiolabs.com/projects/b21b5fac-a347-4c1a-b9b0-9965a93893ea/mini.png" alt="SensioLabsInsight" /></a></p>
-<p>This is a light library to process HTML forms in Web applications. Its main
-goal is to delegate concerns like, validation, rendering, translation, and
-dynamic modification/population to well-known components.</p>
-<p>This package is intended to be used as a glue for packages that provide the
-following functionality.</p>
-<ul>
-<li>Rendering (<a href="http://twig.sensiolabs.org/">Twig</a>)</li>
-<li>Validation (<a href="http://framework.zend.com/manual/current/en/modules/zend.input-filter.intro.html">Zend input filter</a>)</li>
-<li>Special form elements like CSRF tokens (<a href="https://github.com/symfony/security-csrf">Symfony Security CSRF</a>), and
-Captcha elements (<a href="http://framework.zend.com/manual/current/en/modules/zend.captcha.intro.html">Zend CAPTCHA</a>).</li>
-</ul>
-<p>All these dependencies are <em>optional</em> and more adapters can be added to
-provide the same functionality with other components.</p>
-<p>The reason behind this package is that most popular PHP packages (like
-<a href="http://symfony.com/doc/current/components/form/introduction.html">Symfony</a> and <a href="http://framework.zend.com/manual/current/en/modules/zend.form.intro.html">Zend</a>) require you to install several dependencies,
-like translation, validation, and event dispatching packages, even if you
-don't need to use them.</p>
-<p>If you are already using a form component as part of its corresponding framework,
-you probably will not find this package very useful. This package is intended to
-be used when you need a simple integration and you don't need or want to install
-more packages than you already have.</p>
-<h2>Examples</h2>
-<p>You can find some working examples in a small Slim application in this
-<a href="https://github.com/MontealegreLuis/easy-forms-examples">repository</a>.</p>
+                    <h1>CSRF tokens</h1>
+<p>In order to protect your application from Cross Site Request Forgery (CSRF) attacks
+you can generate and validate secret tokens and include them in your forms. This
+package integrates the Symfony Security CSRF package to do that task.</p>
+<p>Let's add a CSRF token to the <code>LoginForm</code> used in previous examples.</p>
+<pre><code class="language-php">use EasyForms\Elements\Csrf\TokenProvider;
+use EasyForms\Elements\Text;
+use EasyForms\Elements\Password;
+use EasyForms\Elements\Csrf;
+use EasyForms\Form;
+
+class LoginForm extends Form
+{
+    public function __construct(TokenProvider $csrfTokenProvider)
+    {
+        $this
+            -&gt;add(new Text('username'))
+            -&gt;add(new Password('password'))
+            -&gt;add(new Csrf('csrf_token', '_login_csrf_token', $csrfTokenProvider))
+        ;
+    }
+}</code></pre>
+<p>A <code>Csrf</code> form element requires a name (as any element) an identifier for the token
+and a <code>TokenProvider</code> object. We can configure a Symfony2 token provider as follows:</p>
+<pre><code class="language-php">use EasyForms\Bridges\SymfonyCsrf\CsrfTokenProvider;
+use Symfony\Component\Security\Csrf\CsrfTokenManager;
+use Symfony\Component\Security\Csrf\TokenGenerator\UriSafeTokenGenerator;
+use Symfony\Component\Security\Csrf\TokenStorage\NativeSessionTokenStorage;
+
+$loginform = new LoginForm(new CsrfTokenProvider(
+   new CsrfTokenManager(new UriSafeTokenGenerator(), new NativeSessionTokenStorage())
+));</code></pre>
+<p>You could validate the token adding a validator to the <code>LoginFilter</code> object showed in
+previous examples.</p>
+<pre><code class="language-php">use EasyForms\Bridges\Zend\InputFilter\Validator\CsrfValidator;
+use EasyForms\Elements\Csrf\TokenProvider;
+use Zend\InputFilter\Input;
+use Zend\InputFilter\InputFilter;
+
+class LoginFilter extends InputFilter
+{
+    public function __construct(TokenProvider $tokenProvider)
+    {
+        $this
+            /* ... */
+            -&gt;add($this-&gt;buildCsrfInput($tokenProvider))
+        ;
+    }
+
+    /* ... */
+
+    protected function buildCsrfInput(TokenProvider $tokenProvider)
+    {
+        $csrf = new Input('csrf_token');
+        $csrf-&gt;setContinueIfEmpty(true);
+        $csrf
+            -&gt;getValidatorChain()
+            -&gt;attach(new CsrfValidator([
+                'tokenProvider' =&gt; $tokenProvider,
+                'tokenId' =&gt; '_login_csrf_token',
+                'updateToken' =&gt; true,
+            ]))
+        ;
+
+        return $csrf;
+    }
+}</code></pre>
+<p>Now you could validate your form as usual. Note that this form element does not
+require special treatment in the template since it is a simple <code>hidden</code> element.</p>
                 </section>
 
             </div>

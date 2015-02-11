@@ -84,6 +84,9 @@
                 <section class="col-sm-offset-3 col-lg-offset-2 col-sm-9 col-lg-10">
                     <h1>Easy form handling for PHP</h1>
 <p><a href="https://travis-ci.org/ComPHPPuebla/easy-forms"><img src="https://travis-ci.org/ComPHPPuebla/easy-forms.svg?branch=master" alt="Build Status" /></a>
+<a href="https://packagist.org/packages/comphppuebla/easy-forms"><img src="https://poser.pugx.org/comphppuebla/easy-forms/v/stable.svg" alt="Latest Stable Version" /></a>
+<a href="https://packagist.org/packages/comphppuebla/easy-forms"><img src="https://poser.pugx.org/comphppuebla/easy-forms/v/unstable.svg" alt="Latest Unstable Version" /></a>
+<a href="https://packagist.org/packages/comphppuebla/easy-forms"><img src="https://poser.pugx.org/comphppuebla/easy-forms/license.svg" alt="License" /></a>
 <a href="https://insight.sensiolabs.com/projects/b21b5fac-a347-4c1a-b9b0-9965a93893ea"><img src="https://insight.sensiolabs.com/projects/b21b5fac-a347-4c1a-b9b0-9965a93893ea/mini.png" alt="SensioLabsInsight" /></a></p>
 <p>This is a light library to process HTML forms in Web applications. Its main
 goal is to delegate concerns like, validation, rendering, translation, and
@@ -97,7 +100,7 @@ following functionality.</p>
 Captcha elements (<a href="http://framework.zend.com/manual/current/en/modules/zend.captcha.intro.html">Zend CAPTCHA</a>).</li>
 </ul>
 <p>All these dependencies are <em>optional</em> and more adapters can be added to
-provide the same functionality with other components.</p>
+provide the same functionality with other libraries.</p>
 <p>The reason behind this package is that most popular PHP packages (like
 <a href="http://symfony.com/doc/current/components/form/introduction.html">Symfony</a> and <a href="http://framework.zend.com/manual/current/en/modules/zend.form.intro.html">Zend</a>) require you to install several dependencies,
 like translation, validation, and event dispatching packages, even if you
@@ -109,6 +112,13 @@ more packages than you already have.</p>
 <h2>Examples</h2>
 <p>You can find some working examples in a small Slim application in this
 <a href="https://github.com/MontealegreLuis/easy-forms-examples">repository</a>.</p>
+<h2>Unit Tests</h2>
+<p>Setup the test suite using Composer:</p>
+<pre><code class="language-bash">$ composer install --dev</code></pre>
+<p>Run it using PHPUnit and PHPSpec:</p>
+<pre><code class="language-bash">$ php bin/phpunit --testdox &amp;&amp; php bin/phpspec run</code></pre>
+<h2>License</h2>
+<p><code>EasyForms</code> is released under the MIT License.</p>
                 </section>
 
             </div>

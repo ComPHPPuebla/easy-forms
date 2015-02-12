@@ -33,6 +33,13 @@
         "phpunit/phpunit": "~4.4",
         "zendframework/zendservice-recaptcha": "~2.0"
     },
+    "suggest": {
+        "twig/twig": "To provide form rendering",
+        "zendframework/zend-inputfilter": "For filtering and validation",
+        "symfony/security-csrf": "To protect forms against CSRF atacks",
+        "zendframework/zend-captcha": "To use CAPTCHA images in forms",
+        "zendframework/zendservice-recaptcha": "To use ReCAPTCHA elements in forms"
+    },
     "extra": {
         "branch-alias": {
             "dev-master": "1.0.x-dev"

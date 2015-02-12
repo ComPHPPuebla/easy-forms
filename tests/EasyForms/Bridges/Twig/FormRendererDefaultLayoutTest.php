@@ -299,4 +299,27 @@ class FormRendererDefaultLayoutTest extends TestCase
             $html
         );
     }
+
+    /** @test */
+    public function it_should_render_all_the_form_elements_that_were_not_already_rendered_individually()
+    {
+        $form = new Form();
+        $form
+            ->add(new Text('username'))
+            ->add(new Hidden('user_id'))
+            ->add(new Hidden('user_role_id'))
+        ;
+        $form->submit(['user_id' => 1, 'user_role_id' => 2]);
+
+        $view = $form->buildView();
+
+        $this->renderer->renderRow($view->username, ['label' => 'Username']);
+
+        $html = $this->renderer->renderRest($view);
+
+        $this->assertEquals(
+            '<input type="hidden" name="user_id" value="1"><input type="hidden" name="user_role_id" value="2">',
+            $html
+        );
+    }
 }

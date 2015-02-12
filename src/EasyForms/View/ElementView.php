@@ -27,7 +27,11 @@ class ElementView
      */
     public $messages = [];
 
-    /** @var boolean */
+    /**
+     * It will be true if there's at least one element in $messages
+     *
+     * @var boolean
+     */
     public $isValid;
 
     /** @var boolean  */
@@ -47,6 +51,9 @@ class ElementView
      * @var array
      */
     public $choices = [];
+
+    /** @var boolean */
+    public $rendered;
 
     /**
      * The name of the block that will render the HTML for this element

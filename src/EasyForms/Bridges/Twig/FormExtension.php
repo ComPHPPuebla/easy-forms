@@ -44,6 +44,7 @@ class FormExtension extends Extension
             new SimpleFunction('label', [$this->renderer, 'renderLabel'], ['is_safe' => ['html']]),
             new SimpleFunction('element', [$this->renderer, 'renderElement'], ['is_safe' => ['html']]),
             new SimpleFunction('errors', [$this->renderer, 'renderErrors'], ['is_safe' => ['html']]),
+            new SimpleFunction('form_rest', [$this->renderer, 'renderRest'], ['is_safe' => ['html']]),
             new SimpleFunction('form_end', [$this->renderer, 'renderFormEnd'], ['is_safe' => ['html']]),
         ];
     }

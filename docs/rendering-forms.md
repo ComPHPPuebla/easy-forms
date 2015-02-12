@@ -108,3 +108,54 @@ than one template this way, therefore the value should be inside an array.
 </button>
 {{ form_end() }}
 ```
+
+If you want more control to render your form elements you could use the functions
+`label`, `element`, and `errors` each renders what its says. Then, we could render
+the `name` element as follows.
+
+```twig
+<div>
+    {# Arguments: element, label, element ID, HTML attributes #}
+    {{- label(element, 'Name', 'name', {'class' => 'element-label'}) -}}
+    {# Arguments: element, HTML attributes, element options #}
+    {{- element(element, {'class' => 'form-element'}, {'block': 'money'}) -}}
+    {{- errors(element) -}}
+</div>
+```
+
+Another useful function is `form_rest` which renders all the elements of a form
+that haven't been rendered. This function does not need arguments, that's why
+it is recommended to use it only with elements that do not need special
+formatting or labels, like `hidden` elements. Then instead of rendering
+`productId` and `csrf` which are hidden elements in the following form.
+
+```twig
+{{ form_start(form) }}
+
+{{ element_row(form.name, {'label': 'Name', 'attr': {'id': 'name'}}) }}
+{{ element_row(form.unitPrice, {'label': 'Price', 'attr': {'id': 'price'}}) }}
+
+{{ element_row(form.productId) }} {# this is a hidden element #}
+{{ element_row(form.csrf) }} {# this is a hidden element with a CSRF token #}
+
+<button type="submit" class="btn btn-default">
+    <span class="glyphicon glyphicon-th-list"></span> Add to catalog
+</button>
+{{ form_end() }}
+```
+
+We could use `form_rest` instead
+
+```twig
+{{ form_start(form) }}
+
+{{ element_row(form.name, {'label': 'Name', 'attr': {'id': 'name'}}) }}
+{{ element_row(form.unitPrice, {'label': 'Price', 'attr': {'id': 'price'}}) }}
+
+{{ form_rest(form) }} {# Render the hidden elements in one call #}
+
+<button type="submit" class="btn btn-default">
+    <span class="glyphicon glyphicon-th-list"></span> Add to catalog
+</button>
+{{ form_end() }}
+```

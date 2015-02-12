@@ -42,6 +42,24 @@ class FormRenderer
     }
 
     /**
+     * @param FormView $form
+     * @return string
+     */
+    public function renderRest(FormView $form)
+    {
+        $rest = '';
+
+        /** @var ElementView $element */
+        foreach ($form as $element) {
+            if (!$element->rendered) {
+                $rest .= $this->renderRow($element);
+            }
+        }
+
+        return $rest;
+    }
+
+    /**
      * @param ElementView $element
      * @param array $options {
      *     @var array   $attr       This element HTML attributes
@@ -65,13 +83,16 @@ class FormRenderer
     {
         $this->options->overrideBlocks($element, $options);
 
-        return $this->renderBlock($element->block, [
+        $html = $this->renderBlock($element->block, [
             'element' => $element,
             'attr' => array_merge($element->attributes, $attributes),
             'value' => $element->value,
             'options' => array_merge($element->options, $options),
             'choices' => $element->choices,
         ]);
+        $element->rendered = true;
+
+        return $html;
     }
 
     /**

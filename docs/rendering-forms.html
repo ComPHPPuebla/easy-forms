@@ -175,6 +175,45 @@ than one template this way, therefore the value should be inside an array.</p>
     &lt;span class="glyphicon glyphicon-th-list"&gt;&lt;/span&gt; Add to catalog
 &lt;/button&gt;
 {{ form_end() }}</code></pre>
+<p>If you want more control to render your form elements you could use the functions
+<code>label</code>, <code>element</code>, and <code>errors</code> each renders what its says. Then, we could render
+the <code>name</code> element as follows.</p>
+<pre><code class="language-twig">&lt;div&gt;
+    {# Arguments: element, label, element ID, HTML attributes #}
+    {{- label(element, 'Name', 'name', {'class' =&gt; 'element-label'}) -}}
+    {# Arguments: element, HTML attributes, element options #}
+    {{- element(element, {'class' =&gt; 'form-element'}, {'block': 'money'}) -}}
+    {{- errors(element) -}}
+&lt;/div&gt;</code></pre>
+<p>Another useful function is <code>form_rest</code> which renders all the elements of a form
+that haven't been rendered. This function does not need arguments, that's why
+it is recommended to use it only with elements that do not need special
+formatting or labels, like <code>hidden</code> elements. Then instead of rendering
+<code>productId</code> and <code>csrf</code> which are hidden elements in the following form.</p>
+<pre><code class="language-twig">{{ form_start(form) }}
+
+{{ element_row(form.name, {'label': 'Name', 'attr': {'id': 'name'}}) }}
+{{ element_row(form.unitPrice, {'label': 'Price', 'attr': {'id': 'price'}}) }}
+
+{{ element_row(form.productId) }} {# this is a hidden element #}
+{{ element_row(form.csrf) }} {# this is a hidden element with a CSRF token #}
+
+&lt;button type="submit" class="btn btn-default"&gt;
+    &lt;span class="glyphicon glyphicon-th-list"&gt;&lt;/span&gt; Add to catalog
+&lt;/button&gt;
+{{ form_end() }}</code></pre>
+<p>We could use <code>form_rest</code> instead</p>
+<pre><code class="language-twig">{{ form_start(form) }}
+
+{{ element_row(form.name, {'label': 'Name', 'attr': {'id': 'name'}}) }}
+{{ element_row(form.unitPrice, {'label': 'Price', 'attr': {'id': 'price'}}) }}
+
+{{ form_rest(form) }} {# Render the hidden elements in one call #}
+
+&lt;button type="submit" class="btn btn-default"&gt;
+    &lt;span class="glyphicon glyphicon-th-list"&gt;&lt;/span&gt; Add to catalog
+&lt;/button&gt;
+{{ form_end() }}</code></pre>
                 </section>
 
             </div>

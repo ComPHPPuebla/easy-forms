@@ -6,7 +6,7 @@
  *
  * @copyright Comunidad PHP Puebla 2015 (http://www.comunidadphppuebla.com)
  */
-namespace spec\EasyForms\Bridges\SymfonyCsrf;
+namespace spec\EasyForms\Bridges\Symfony\Security;
 
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;

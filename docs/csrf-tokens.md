@@ -30,7 +30,7 @@ A `Csrf` form element requires a name (as any element) an identifier for the tok
 and a `TokenProvider` object. We can configure a Symfony2 token provider as follows:
 
 ```php
-use EasyForms\Bridges\SymfonyCsrf\CsrfTokenProvider;
+use EasyForms\Bridges\Symfony\Security\CsrfTokenProvider;
 use Symfony\Component\Security\Csrf\CsrfTokenManager;
 use Symfony\Component\Security\Csrf\TokenGenerator\UriSafeTokenGenerator;
 use Symfony\Component\Security\Csrf\TokenStorage\NativeSessionTokenStorage;

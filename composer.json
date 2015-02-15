@@ -31,14 +31,16 @@
         "zendframework/zend-captcha": "~2.3",
         "phpspec/phpspec": "~2.1",
         "phpunit/phpunit": "~4.4",
-        "zendframework/zendservice-recaptcha": "~2.0"
+        "zendframework/zendservice-recaptcha": "~2.0",
+        "symfony/console": "~2.6"
     },
     "suggest": {
         "twig/twig": "To provide form rendering",
         "zendframework/zend-inputfilter": "For filtering and validation",
         "symfony/security-csrf": "To protect forms against CSRF atacks",
         "zendframework/zend-captcha": "To use CAPTCHA images in forms",
-        "zendframework/zendservice-recaptcha": "To use ReCAPTCHA elements in forms"
+        "zendframework/zendservice-recaptcha": "To use ReCAPTCHA elements in forms",
+        "symfony/console": "To build your forms interactively through the console"
     },
     "extra": {
         "branch-alias": {

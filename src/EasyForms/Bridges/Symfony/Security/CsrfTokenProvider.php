@@ -6,7 +6,7 @@
  *
  * @copyright Comunidad PHP Puebla 2015 (http://www.comunidadphppuebla.com)
  */
-namespace EasyForms\Bridges\SymfonyCsrf;
+namespace EasyForms\Bridges\Symfony\Security;
 
 use EasyForms\Elements\Csrf\TokenProvider;
 use Symfony\Component\Security\Csrf\CsrfToken;

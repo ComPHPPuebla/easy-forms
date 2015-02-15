@@ -1,4 +1,3 @@
-bin/
 .couscous/
 vendor/
 composer.lock

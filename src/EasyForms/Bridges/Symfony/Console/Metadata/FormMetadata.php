@@ -13,6 +13,7 @@ use EasyForms\Elements\File;
 use EasyForms\Elements\Hidden;
 use EasyForms\Elements\Password;
 use EasyForms\Elements\Text;
+use ReflectionClass;
 
 class FormMetadata
 {
@@ -36,16 +37,18 @@ class FormMetadata
     public function __construct()
     {
         $this->types = [
-            'text' => new ClassMetadata(Text::class),
-            'password' => new ClassMetadata(Password::class),
-            'hidden' => new ClassMetadata(Hidden::class),
-            'checkbox' => new ClassMetadata(Checkbox::class),
-            'file' => new ClassMetadata(File::class),
+            'text' => new ReflectionClass(Text::class),
+            'password' => new ReflectionClass(Password::class),
+            'hidden' => new ReflectionClass(Hidden::class),
+            'checkbox' => new ReflectionClass(Checkbox::class),
+            'file' => new ReflectionClass(File::class),
         ];
     }
 
 
     /**
+     * This method cannot use reflection because this class does not exist yet
+     *
      * @param string $fullyQualifiedName
      */
     public function setClassName($fullyQualifiedName)
@@ -102,8 +105,13 @@ class FormMetadata
     public function __toString()
     {
         $elements = '';
+
+        /**
+         * @var string $name
+         * @var ReflectionClass $class
+         */
         foreach ($this->elements as $name => $class) {
-            $elements .= "{$name} of type {$class->fullyQualifiedName()}\n";
+            $elements .= "{$name} of type {$class->getName()}\n";
         }
 
         return "{$this->className} with the elements:\n{$elements}";

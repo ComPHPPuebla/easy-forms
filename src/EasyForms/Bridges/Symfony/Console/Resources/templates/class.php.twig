@@ -2,7 +2,7 @@
 namespace {{ form.formNamespace() }};
 
 {% for class in form.elements() %}
-use {{ class.fullyQualifiedName() }};
+use {{ class.getName() }};
 {% endfor %}
 use EasyForms\Form;
 
@@ -12,7 +12,7 @@ class {{ form.className() }} extends Form
     {
         $this
     {% for name, class in form.elements() %}
-        ->add(new {{ class.name() }}('{{ name }}'))
+        ->add(new {{ class.getShortName() }}('{{ name }}'))
     {% endfor %}
     ;
     }

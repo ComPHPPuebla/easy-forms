@@ -19,6 +19,9 @@ class FormMetadata
     /** @var string */
     protected $className;
 
+    /** @var string */
+    protected $namespace;
+
     /**
      * Keys contain the elements names and the values contain the elements' FQCNs
      *
@@ -27,20 +30,29 @@ class FormMetadata
     protected $elements = [];
 
     /** @var array */
-    protected $types = [
-        'text' => Text::class,
-        'password' => Password::class,
-        'hidden' => Hidden::class,
-        'checkbox' => Checkbox::class,
-        'file' => File::class,
-    ];
+    protected $types;
+
+
+    public function __construct()
+    {
+        $this->types = [
+            'text' => new ClassMetadata(Text::class),
+            'password' => new ClassMetadata(Password::class),
+            'hidden' => new ClassMetadata(Hidden::class),
+            'checkbox' => new ClassMetadata(Checkbox::class),
+            'file' => new ClassMetadata(File::class),
+        ];
+    }
+
 
     /**
      * @param string $fullyQualifiedName
      */
     public function setClassName($fullyQualifiedName)
     {
-        $this->className = $fullyQualifiedName;
+        $parts = explode('\\', $fullyQualifiedName);
+        $this->className = array_pop($parts);
+        $this->namespace = implode('\\', $parts);
     }
 
     /**
@@ -50,6 +62,30 @@ class FormMetadata
     public function addElement($name, $type)
     {
         $this->elements[$name] = $this->types[$type];
+    }
+
+    /**
+     * @return string
+     */
+    public function className()
+    {
+        return $this->className;
+    }
+
+    /**
+     * @return string
+     */
+    public function formNamespace()
+    {
+        return $this->namespace;
+    }
+
+    /**
+     * @return array
+     */
+    public function elements()
+    {
+        return $this->elements;
     }
 
     /**
@@ -67,7 +103,7 @@ class FormMetadata
     {
         $elements = '';
         foreach ($this->elements as $name => $class) {
-            $elements .= "{$name} of type {$class}\n";
+            $elements .= "{$name} of type {$class->fullyQualifiedName()}\n";
         }
 
         return "{$this->className} with the elements:\n{$elements}";

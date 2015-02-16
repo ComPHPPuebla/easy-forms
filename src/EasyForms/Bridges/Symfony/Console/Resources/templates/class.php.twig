@@ -1,0 +1,19 @@
+<?php
+namespace {{ form.formNamespace() }};
+
+{% for class in form.elements() %}
+use {{ class.fullyQualifiedName() }};
+{% endfor %}
+use EasyForms\Form;
+
+class {{ form.className() }} extends Form
+{
+    public function __construct()
+    {
+        $this
+    {% for name, class in form.elements() %}
+        ->add(new {{ class.name() }}('{{ name }}'))
+    {% endfor %}
+    ;
+    }
+}

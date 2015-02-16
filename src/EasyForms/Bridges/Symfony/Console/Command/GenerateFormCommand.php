@@ -53,5 +53,6 @@ class GenerateFormCommand extends Command
         }
 
         $output->writeln("Generating the form:\n<info>{$formHelper->metadata()}</info>");
+        $output->writeln($formHelper->generate());
     }
 }

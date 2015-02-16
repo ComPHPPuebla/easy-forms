@@ -24,11 +24,14 @@ if (!$composerAutoLoaderFound) {
 }
 
 use EasyForms\Bridges\Symfony\Console\Command\GenerateFormCommand;
+use EasyForms\Bridges\Symfony\Console\Generator\FormGenerator;
 use EasyForms\Bridges\Symfony\Console\Helper\FormHelper;
 use EasyForms\Bridges\Symfony\Console\Metadata\FormMetadata;
 use Symfony\Component\Console\Application;
+use Twig_Loader_Filesystem as Loader;
+use Twig_Environment as Twig;
 
 $application = new Application('EasyForms Console Tool', '1.0@dev');
-$application->getHelperSet()->set(new FormHelper(new FormMetadata()));
+$application->getHelperSet()->set(new FormHelper(new FormMetadata(), new FormGenerator(new Twig(new Loader()))));
 $application->add(new GenerateFormCommand());
 $application->run();

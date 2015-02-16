@@ -8,6 +8,7 @@
  */
 namespace EasyForms\Bridges\Symfony\Console\Helper;
 
+use EasyForms\Bridges\Symfony\Console\Generator\FormGenerator;
 use EasyForms\Bridges\Symfony\Console\Metadata\FormMetadata;
 use Symfony\Component\Console\Helper\Helper;
 use Symfony\Component\Console\Helper\QuestionHelper;
@@ -31,12 +32,17 @@ class FormHelper extends Helper
     /** @var ConfirmationQuestion */
     protected $moreElements;
 
+    /** @var FormGenerator */
+    protected $generator;
+
     /**
      * @param FormMetadata $formMetadata
+     * @param FormGenerator $generator
      */
-    public function __construct(FormMetadata $formMetadata)
+    public function __construct(FormMetadata $formMetadata, FormGenerator $generator)
     {
         $this->formMetadata = $formMetadata;
+        $this->generator = $generator;
         $this->elementName = new Question("What is the name of your element?\n> ");
         $this->elementType = new ChoiceQuestion(
             'What kind of element do you want to add?',
@@ -94,6 +100,14 @@ class FormHelper extends Helper
     }
 
     /**
+     * @return string
+     */
+    public function generate()
+    {
+        echo $this->generator->generate($this->formMetadata);
+    }
+
+    /**
      * Returns the canonical name of this helper.
      *
      * @return string The canonical name
@@ -104,5 +118,4 @@ class FormHelper extends Helper
     {
         return 'form';
     }
-
 }

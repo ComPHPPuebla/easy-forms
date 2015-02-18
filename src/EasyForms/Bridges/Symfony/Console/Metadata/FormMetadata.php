@@ -76,6 +76,24 @@ class FormMetadata
     }
 
     /**
+     * @param string $baseDirectory
+     * @return string
+     */
+    public function classDirectory($baseDirectory)
+    {
+        return $baseDirectory . str_replace('\\', '/', $this->namespace);
+    }
+
+    /**
+     * @param string $baseDirectory
+     * @return string
+     */
+    public function classFilename($baseDirectory)
+    {
+        return "{$this->classDirectory($baseDirectory)}/{$this->className}.php";
+    }
+
+    /**
      * @return string
      */
     public function formNamespace()

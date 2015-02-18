@@ -17,6 +17,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Symfony\Component\Console\Question\Question;
+use Symfony\Component\Filesystem\Filesystem;
 
 class FormHelper extends Helper
 {
@@ -35,14 +36,19 @@ class FormHelper extends Helper
     /** @var FormGenerator */
     protected $generator;
 
+    /** @var FileSystem */
+    protected $fileSystem;
+
     /**
      * @param FormMetadata $formMetadata
      * @param FormGenerator $generator
+     * @param Filesystem $fileSystem
      */
-    public function __construct(FormMetadata $formMetadata, FormGenerator $generator)
+    public function __construct(FormMetadata $formMetadata, FormGenerator $generator, Filesystem $fileSystem)
     {
         $this->formMetadata = $formMetadata;
         $this->generator = $generator;
+        $this->fileSystem = $fileSystem;
         $this->elementName = new Question("What is the name of your element?\n> ");
         $this->elementType = new ChoiceQuestion(
             'What kind of element do you want to add?',
@@ -104,7 +110,17 @@ class FormHelper extends Helper
      */
     public function generate()
     {
-        echo $this->generator->generate($this->formMetadata);
+        return $this->generator->generate($this->formMetadata);
+    }
+
+    /**
+     * @param string $directory
+     * @param string $classCode
+     */
+    public function write($directory, $classCode)
+    {
+        $this->fileSystem->mkdir($this->formMetadata->classDirectory($directory));
+        $this->fileSystem->dumpFile($this->formMetadata->classFilename($directory), $classCode);
     }
 
     /**

@@ -25,10 +25,9 @@ class GenerateFormCommand extends Command
             ->setName('form:create')
             ->setDescription('Generate a form interactively')
             ->addArgument(
-                'class',
-                InputArgument::REQUIRED,
-                'The fully qualified name for your new form "Example\Forms\CoolForm"'
+                'class', InputArgument::REQUIRED, 'The fully qualified name for your new form "Example\Forms\CoolForm"'
             )
+            ->addArgument('directory', InputArgument::REQUIRED, 'The directory to which classes will be saved')
         ;
     }
 
@@ -53,6 +52,8 @@ class GenerateFormCommand extends Command
         }
 
         $output->writeln("Generating the form:\n<info>{$formHelper->metadata()}</info>");
-        $output->writeln($formHelper->generate());
+        $output->writeln($classCode = $formHelper->generate());
+        $formHelper->write($input->getArgument('path'), $classCode);
+        $output->writeln('<info>Class successfully created.</info>');
     }
 }

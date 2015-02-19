@@ -41,14 +41,6 @@ class FormGenerator
         $formMetadata->setCode($this->view->render('templates/class.php.twig', [
             'form' => $formMetadata,
         ]));
-        $this->write($formMetadata);
-    }
-
-    /**
-     * @param FormMetadata $formMetadata
-     */
-    public function write(FormMetadata $formMetadata)
-    {
         $this->fileSystem->mkdir($formMetadata->classDirectory());
         $this->fileSystem->dumpFile($formMetadata->classFilename(), $formMetadata->code());
     }

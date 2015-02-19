@@ -36,6 +36,7 @@ class FormMetadata
     /** @var string */
     protected $code;
 
+    /** @var string */
     protected $targetDirectory;
 
     /**

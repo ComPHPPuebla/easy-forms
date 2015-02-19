@@ -9,6 +9,8 @@
 namespace EasyForms\Bridges\Symfony\Console\Command;
 
 use EasyForms\Bridges\Symfony\Console\Helper\FormHelper;
+use EasyForms\CodeGeneration\Forms\FormGenerator;
+use EasyForms\CodeGeneration\Forms\FormMetadata;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -16,6 +18,19 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class GenerateFormCommand extends Command
 {
+    /** @var FormMetadata */
+    protected $metadata;
+
+    /** @var FormGenerator */
+    protected $generator;
+
+    public function __construct(FormMetadata $metadata, FormGenerator $generator)
+    {
+        parent::__construct();
+        $this->metadata = $metadata;
+        $this->generator = $generator;
+    }
+
     /**
      * To create a form you must provide its FQCN
      */
@@ -40,20 +55,15 @@ class GenerateFormCommand extends Command
     {
         /** @var FormHelper $formHelper */
         $formHelper = $this->getHelper('form');
-        $formHelper->setClassName($class = $input->getArgument('class'));
 
-        $output->writeln("Specify the elements for <info>$class</info>");
+        $output->writeln("\n<comment>Specify the elements for:</comment>");
+        $output->writeln("<info>{$input->getArgument('class')}</info>\n\n");
 
-        $moreElements = true;
-        while ($moreElements) {
-            $formHelper->addElement($input, $output);
-            $moreElements = $formHelper->moreElements($input, $output);
-            $output->writeln('');
-        }
+        $this->metadata->populate($input->getArgument('class'), $formHelper->addElements($input, $output));
+        $this->metadata->setTargetDirectory($input->getArgument('directory'));
 
-        $output->writeln("Generating the form:\n<info>{$formHelper->metadata()}</info>");
-        $output->writeln($classCode = $formHelper->generate());
-        $formHelper->write($input->getArgument('path'), $classCode);
-        $output->writeln('<info>Class successfully created.</info>');
+        $this->generator->generate($this->metadata);
+
+        $formHelper->showForm($this->metadata, $output);
     }
 }

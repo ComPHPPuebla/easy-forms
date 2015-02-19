@@ -8,8 +8,7 @@
  */
 namespace EasyForms\Bridges\Symfony\Console\Helper;
 
-use EasyForms\Bridges\Symfony\Console\Generator\FormGenerator;
-use EasyForms\Bridges\Symfony\Console\Metadata\FormMetadata;
+use EasyForms\CodeGeneration\Forms\FormMetadata;
 use Symfony\Component\Console\Helper\Helper;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputInterface;
@@ -17,68 +16,52 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Symfony\Component\Console\Question\Question;
-use Symfony\Component\Filesystem\Filesystem;
 
 class FormHelper extends Helper
 {
-    /** @var FormMetadata */
-    protected $formMetadata;
+    /** @var array */
+    protected $elements;
 
     /** @var ChoiceQuestion */
-    protected $elementType;
+    protected $typeQuestion;
 
     /** @var Question */
-    protected $elementName;
+    protected $nameQuestion;
 
     /** @var ConfirmationQuestion */
-    protected $moreElements;
-
-    /** @var FormGenerator */
-    protected $generator;
-
-    /** @var FileSystem */
-    protected $fileSystem;
+    protected $moreElementsQuestion;
 
     /**
-     * @param FormMetadata $formMetadata
-     * @param FormGenerator $generator
-     * @param Filesystem $fileSystem
+     * Initialize questions to be asked to user when building a form
+     *
+     * @param array $elementTypes
      */
-    public function __construct(FormMetadata $formMetadata, FormGenerator $generator, Filesystem $fileSystem)
+    public function __construct(array $elementTypes)
     {
-        $this->formMetadata = $formMetadata;
-        $this->generator = $generator;
-        $this->fileSystem = $fileSystem;
-        $this->elementName = new Question("What is the name of your element?\n> ");
-        $this->elementType = new ChoiceQuestion(
-            'What kind of element do you want to add?',
-            ['text', 'textarea', 'hidden', 'password', 'select', 'radio', 'checkbox', 'captcha', 'csrf token'],
-            0
+        $this->elements = [];
+        $this->nameQuestion = new Question("\n<question>What is the name of your element?</question>\n> ");
+        $this->typeQuestion = new ChoiceQuestion(
+            '<question>What kind of element do you want to add?</question>', $elementTypes
         );
-        $this->moreElements = new ConfirmationQuestion(
-            "Do you want to add another element (<info>y/n</info>)? \n", false
+        $this->moreElementsQuestion = new ConfirmationQuestion(
+            "<question>Do you want to add another element (y/n)?</question> \n", false
         );
-    }
-
-    /**
-     * @param string $fullyQualifiedName
-     */
-    public function setClassName($fullyQualifiedName)
-    {
-        $this->formMetadata->setClassName($fullyQualifiedName);
     }
 
     /**
      * @param InputInterface $input
      * @param OutputInterface $output
-     * @return boolean
+     * @return array
      */
-    public function moreElements(InputInterface $input, OutputInterface $output)
+    public function addElements(InputInterface $input, OutputInterface $output)
     {
-        /** @var QuestionHelper $questions */
-        $questions = $this->getHelperSet()->get('question');
+        $this->addElement($input, $output);
+        while ($this->moreElements($input, $output)) {
+            $this->addElement($input, $output);
+            $output->writeln('');
+        }
 
-        return $questions->ask($input, $output, $this->moreElements);
+        return $this->elements;
     }
 
     /**
@@ -87,40 +70,40 @@ class FormHelper extends Helper
      * @param InputInterface $input
      * @param OutputInterface $output
      */
-    public function addElement(InputInterface $input, OutputInterface $output)
+    protected function addElement(InputInterface $input, OutputInterface $output)
     {
         /** @var QuestionHelper $questions */
-        $questions = $this->getHelperSet()->get('question');
-        $this->formMetadata->addElement(
-            $questions->ask($input, $output, $this->elementName),
-            $questions->ask($input, $output, $this->elementType)
-        );
+        $question = $this->getHelperSet()->get('question');
+
+        $name = $question->ask($input, $output, $this->nameQuestion);
+        $type = $question->ask($input, $output, $this->typeQuestion);
+
+        $this->elements[$name] = $type;
     }
 
     /**
-     * @return FormMetadata
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     * @return boolean
      */
-    public function metadata()
+    protected function moreElements(InputInterface $input, OutputInterface $output)
     {
-        return $this->formMetadata;
+        /** @var QuestionHelper $questions */
+        $question = $this->getHelperSet()->get('question');
+
+        return $question->ask($input, $output, $this->moreElementsQuestion);
     }
 
     /**
-     * @return string
+     * @param FormMetadata $metadata
+     * @param OutputInterface $output
      */
-    public function generate()
+    public function showForm(FormMetadata $metadata, OutputInterface $output)
     {
-        return $this->generator->generate($this->formMetadata);
-    }
-
-    /**
-     * @param string $directory
-     * @param string $classCode
-     */
-    public function write($directory, $classCode)
-    {
-        $this->fileSystem->mkdir($this->formMetadata->classDirectory($directory));
-        $this->fileSystem->dumpFile($this->formMetadata->classFilename($directory), $classCode);
+        $output->writeln("\n<comment>{$metadata->className()} generated at:</comment>");
+        $output->writeln("<info>{$metadata->classFilename()}</info>");
+        $output->writeln("\n<comment>With code:</comment>");
+        $output->writeln("<info>{$metadata->code()}</info>\n");
     }
 
     /**

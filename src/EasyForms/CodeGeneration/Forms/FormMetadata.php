@@ -6,7 +6,7 @@
  *
  * @copyright Comunidad PHP Puebla 2015 (http://www.comunidadphppuebla.com)
  */
-namespace EasyForms\Bridges\Symfony\Console\Metadata;
+namespace EasyForms\CodeGeneration\Forms;
 
 use EasyForms\Elements\Checkbox;
 use EasyForms\Elements\File;
@@ -33,7 +33,14 @@ class FormMetadata
     /** @var array */
     protected $types;
 
+    /** @var string */
+    protected $code;
 
+    protected $targetDirectory;
+
+    /**
+     * Initialize all the valid form elements
+     */
     public function __construct()
     {
         $this->types = [
@@ -45,13 +52,22 @@ class FormMetadata
         ];
     }
 
+    /**
+     * @param string $className
+     * @param array $elements
+     */
+    public function populate($className, array $elements)
+    {
+        $this->setClassName($className);
+        $this->addElements($elements);
+    }
 
     /**
      * This method cannot use reflection because this class does not exist yet
      *
      * @param string $fullyQualifiedName
      */
-    public function setClassName($fullyQualifiedName)
+    protected function setClassName($fullyQualifiedName)
     {
         $parts = explode('\\', $fullyQualifiedName);
         $this->className = array_pop($parts);
@@ -59,12 +75,45 @@ class FormMetadata
     }
 
     /**
-     * @param string $name
-     * @param string $type
+     * @param array $elements
      */
-    public function addElement($name, $type)
+    protected function addElements(array $elements)
     {
-        $this->elements[$name] = $this->types[$type];
+        foreach ($elements as $name => $type) {
+            $this->elements[$name] = $this->types[$type];
+        }
+    }
+
+    /**
+     * @param $code
+     */
+    public function setCode($code)
+    {
+        $this->code = $code;
+    }
+
+    /**
+     * @return string
+     */
+    public function code()
+    {
+        return $this->code;
+    }
+
+    /**
+     * @param string $targetDirectory
+     */
+    public function setTargetDirectory($targetDirectory)
+    {
+        $this->targetDirectory = $targetDirectory;
+    }
+
+    /**
+     * @return string
+     */
+    public function targetDirectory()
+    {
+        return $this->targetDirectory;
     }
 
     /**
@@ -76,21 +125,19 @@ class FormMetadata
     }
 
     /**
-     * @param string $baseDirectory
      * @return string
      */
-    public function classDirectory($baseDirectory)
+    public function classDirectory()
     {
-        return $baseDirectory . str_replace('\\', '/', $this->namespace);
+        return $this->targetDirectory . str_replace('\\', '/', $this->namespace);
     }
 
     /**
-     * @param string $baseDirectory
      * @return string
      */
-    public function classFilename($baseDirectory)
+    public function classFilename()
     {
-        return "{$this->classDirectory($baseDirectory)}/{$this->className}.php";
+        return "{$this->classDirectory()}/{$this->className}.php";
     }
 
     /**
@@ -115,23 +162,5 @@ class FormMetadata
     public function elementTypes()
     {
         return array_keys($this->types);
-    }
-
-    /**
-     * @return string
-     */
-    public function __toString()
-    {
-        $elements = '';
-
-        /**
-         * @var string $name
-         * @var ReflectionClass $class
-         */
-        foreach ($this->elements as $name => $class) {
-            $elements .= "{$name} of type {$class->getName()}\n";
-        }
-
-        return "{$this->className} with the elements:\n{$elements}";
     }
 }

@@ -1,4 +1,20 @@
 <?php
+/**
+ * PHP version 5.5
+ *
+ * This source file is subject to the license that is bundled with this package in the file LICENSE.
+ *
+ * @copyright Comunidad PHP Puebla 2015 (http://www.comunidadphppuebla.com)
+ */
+use EasyForms\Bridges\Symfony\Console\Command\GenerateFormCommand;
+use EasyForms\Bridges\Symfony\Console\Helper\FormHelper;
+use EasyForms\CodeGeneration\Forms\FormGenerator;
+use EasyForms\CodeGeneration\Forms\FormMetadata;
+use Symfony\Component\Console\Application;
+use Symfony\Component\Filesystem\Filesystem;
+use Twig_Loader_Filesystem as Loader;
+use Twig_Environment as Twig;
+
 $paths = [
     getcwd() . '/vendor/autoload.php',
     getcwd() . '/../../autoload.php',
@@ -23,19 +39,14 @@ if (!$composerAutoLoaderFound) {
     exit(1);
 }
 
-use EasyForms\Bridges\Symfony\Console\Command\GenerateFormCommand;
-use EasyForms\Bridges\Symfony\Console\Generator\FormGenerator;
-use EasyForms\Bridges\Symfony\Console\Helper\FormHelper;
-use EasyForms\Bridges\Symfony\Console\Metadata\FormMetadata;
-use Symfony\Component\Console\Application;
-use Symfony\Component\Filesystem\Filesystem;
-use Twig_Loader_Filesystem as Loader;
-use Twig_Environment as Twig;
-
 $application = new Application('EasyForms Console Tool', '1.0@dev');
+
+$metadata = new FormMetadata();
 $application
     ->getHelperSet()
-    ->set(new FormHelper(new FormMetadata(), new FormGenerator(new Twig(new Loader())), new Filesystem()))
+    ->set(new FormHelper($metadata->elementTypes()))
 ;
-$application->add(new GenerateFormCommand());
+$application->add(
+    new GenerateFormCommand($metadata, new FormGenerator(new Twig(new Loader()), new Filesystem()))
+);
 $application->run();

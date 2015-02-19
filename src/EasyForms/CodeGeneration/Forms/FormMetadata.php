@@ -11,9 +11,12 @@ namespace EasyForms\CodeGeneration\Forms;
 use EasyForms\Elements\Checkbox;
 use EasyForms\Elements\File;
 use EasyForms\Elements\Hidden;
+use EasyForms\Elements\MultiCheckbox;
 use EasyForms\Elements\Password;
+use EasyForms\Elements\Radio;
+use EasyForms\Elements\Select;
 use EasyForms\Elements\Text;
-use ReflectionClass;
+use EasyForms\Elements\TextArea;
 
 class FormMetadata
 {
@@ -45,11 +48,15 @@ class FormMetadata
     public function __construct()
     {
         $this->types = [
-            'text' => new ReflectionClass(Text::class),
-            'password' => new ReflectionClass(Password::class),
-            'hidden' => new ReflectionClass(Hidden::class),
-            'checkbox' => new ReflectionClass(Checkbox::class),
-            'file' => new ReflectionClass(File::class),
+            'text' => new ElementMetadata(Text::class),
+            'text area' => new ElementMetadata(TextArea::class),
+            'password' => new ElementMetadata(Password::class),
+            'hidden' => new ElementMetadata(Hidden::class),
+            'checkbox' => new ElementMetadata(Checkbox::class),
+            'file' => new ElementMetadata(File::class),
+            'radio' => new ElementMetadata(Radio::class),
+            'select' => new ElementMetadata(Select::class),
+            'checkbox multiple' => new ElementMetadata(MultiCheckbox::class),
         ];
     }
 
@@ -80,8 +87,9 @@ class FormMetadata
      */
     protected function addElements(array $elements)
     {
-        foreach ($elements as $name => $type) {
-            $this->elements[$name] = $this->types[$type];
+        foreach ($elements as $name => $options) {
+            $this->elements[$name] = $this->types[$options['type']];
+            $this->elements[$name]->addChoices($options['choices']);
         }
     }
 
@@ -162,6 +170,6 @@ class FormMetadata
      */
     public function elementTypes()
     {
-        return array_keys($this->types);
+        return $this->types;
     }
 }

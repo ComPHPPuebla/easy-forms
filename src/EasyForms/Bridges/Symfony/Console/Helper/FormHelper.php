@@ -9,6 +9,7 @@
 namespace EasyForms\Bridges\Symfony\Console\Helper;
 
 use EasyForms\CodeGeneration\Forms\FormMetadata;
+use EasyForms\Elements\Choice;
 use Symfony\Component\Console\Helper\Helper;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputInterface;
@@ -22,11 +23,26 @@ class FormHelper extends Helper
     /** @var array */
     protected $elements;
 
+    /** @var \ReflectionClass[] */
+    protected $elementTypes;
+
     /** @var ChoiceQuestion */
     protected $typeQuestion;
 
     /** @var Question */
     protected $nameQuestion;
+
+    /** @var ConfirmationQuestion */
+    protected $choicesQuestion;
+
+    /** @var Question */
+    protected $valueQuestion;
+
+    /** @var Question */
+    protected $labelQuestion;
+
+    /** @var ConfirmationQuestion */
+    protected $moreChoicesQuestion;
 
     /** @var ConfirmationQuestion */
     protected $moreElementsQuestion;
@@ -39,9 +55,18 @@ class FormHelper extends Helper
     public function __construct(array $elementTypes)
     {
         $this->elements = [];
+        $this->elementTypes = $elementTypes;
         $this->nameQuestion = new Question("\n<question>What is the name of your element?</question>\n> ");
         $this->typeQuestion = new ChoiceQuestion(
-            '<question>What kind of element do you want to add?</question>', $elementTypes
+            '<question>What kind of element do you want to add?</question>', array_keys($elementTypes)
+        );
+        $this->choicesQuestion = new ConfirmationQuestion(
+            "<question>Do you want to add choices to this element (y/n)?</question> \n", false
+        );
+        $this->valueQuestion = new Question("\n<question>Enter the item's value</question>\n> ");
+        $this->labelQuestion = new Question("\n<question>Enter the item's label</question>\n> ");
+        $this->moreChoicesQuestion = new ConfirmationQuestion(
+            "\n<question>Do you want to add another choice to this element (y/n)?</question> \n", false
         );
         $this->moreElementsQuestion = new ConfirmationQuestion(
             "<question>Do you want to add another element (y/n)?</question> \n", false
@@ -72,13 +97,44 @@ class FormHelper extends Helper
      */
     protected function addElement(InputInterface $input, OutputInterface $output)
     {
-        /** @var QuestionHelper $questions */
+        /** @var QuestionHelper $question */
         $question = $this->getHelperSet()->get('question');
 
         $name = $question->ask($input, $output, $this->nameQuestion);
         $type = $question->ask($input, $output, $this->typeQuestion);
 
-        $this->elements[$name] = $type;
+        $choices = [];
+        if ($this->elementTypes[$type]->isSubclassOf(Choice::class) &&
+            $question->ask($input, $output, $this->choicesQuestion)
+        ) {
+            $choices = $this->addChoices($input, $output);
+        }
+
+        $this->elements[$name] = ['type' => $type, 'choices' => $choices];
+    }
+
+    /**
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     * @return array
+     */
+    protected function addChoices(InputInterface $input, OutputInterface $output)
+    {
+        /** @var QuestionHelper $question */
+        $question = $this->getHelperSet()->get('question');
+
+        $choices = [];
+        $choices[$question->ask($input, $output, $this->valueQuestion)] = $question->ask(
+            $input, $output, $this->labelQuestion
+        );
+
+        while ($question->ask($input, $output, $this->moreChoicesQuestion)) {
+            $choices[$question->ask($input, $output, $this->valueQuestion)] = $question->ask(
+                $input, $output, $this->labelQuestion
+            );
+        }
+
+        return $choices;
     }
 
     /**
@@ -88,7 +144,7 @@ class FormHelper extends Helper
      */
     protected function moreElements(InputInterface $input, OutputInterface $output)
     {
-        /** @var QuestionHelper $questions */
+        /** @var QuestionHelper $question */
         $question = $this->getHelperSet()->get('question');
 
         return $question->ask($input, $output, $this->moreElementsQuestion);

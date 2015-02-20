@@ -50,10 +50,14 @@ abstract class Element
 
     /**
      * Make this element optional
+     *
+     * @return Element
      */
     public function makeOptional()
     {
         $this->isRequired = false;
+
+        return $this;
     }
 
     /**

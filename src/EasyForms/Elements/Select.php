@@ -32,10 +32,14 @@ class Select extends Choice
 
     /**
      * This select allows multiple selection
+     *
+     * @return Element
      */
     public function enableMultipleSelection()
     {
         $this->attributes['multiple'] = true;
+
+        return $this;
     }
 
     /**

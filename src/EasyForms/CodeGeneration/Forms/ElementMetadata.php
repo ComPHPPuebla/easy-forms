@@ -12,30 +12,54 @@ use ReflectionClass;
 
 class ElementMetadata extends ReflectionClass
 {
+    /** @var string */
+    protected $elementName;
+
     /** @var array */
     protected $choices = [];
 
+    /** @var boolean */
+    protected $isOptional = false;
+
     /**
-     * @param array $choices
+     * @param string $name
      */
-    public function addChoices(array $choices)
+    public function setElementName($name)
     {
-        $this->choices = $choices;
+        $this->elementName = $name;
+    }
+
+    public function configure(array $options)
+    {
+        isset($options['choices']) && $this->choices = $options['choices'];
+        $this->isOptional = $options['optional'];
     }
 
     /**
-     * @return array
+     * @return string
      */
-    public function choices()
+    public function __toString()
     {
-        return $this->choices;
+        $choices = '';
+        !empty($this->choices) && $choices= ", {$this->formatChoices()}";
+
+        $element = "new {$this->getShortName()}('{$this->elementName}'{$choices})";
+
+        $this->isOptional && $element = "({$element})->makeOptional()";
+
+        return $element;
     }
 
     /**
-     * @return boolean
+     * @return string
      */
-    public function hasChoices()
+    protected function formatChoices()
     {
-        return !empty($this->choices);
+        $choices = '[';
+        foreach ($this->choices as $value => $label) {
+            $choices .= "'{$value}' => '{$label}', ";
+        }
+
+        return trim($choices, ', ') . ']';
     }
 }

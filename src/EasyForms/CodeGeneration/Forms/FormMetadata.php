@@ -88,9 +88,24 @@ class FormMetadata
     protected function addElements(array $elements)
     {
         foreach ($elements as $name => $options) {
-            $this->elements[$name] = $this->types[$options['type']];
-            $this->elements[$name]->addChoices($options['choices']);
+            $this->elements[$name] = $this->addElement($name, $options);
         }
+    }
+
+    /**
+     * @param string $name
+     * @param array $options
+     * @return ElementMetadata
+     */
+    protected function addElement($name, array $options)
+    {
+        /** @var ElementMetadata $element */
+        $element = $this->types[$options['type']];
+
+        $element->setElementName($name);
+        $element->configure($options);
+
+        return $element;
     }
 
     /**

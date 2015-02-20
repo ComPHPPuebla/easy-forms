@@ -47,6 +47,9 @@ class FormHelper extends Helper
     /** @var ConfirmationQuestion */
     protected $moreElementsQuestion;
 
+    /** @var ConfirmationQuestion */
+    protected $isOptionalQuestion;
+
     /**
      * Initialize questions to be asked to user when building a form
      *
@@ -71,6 +74,7 @@ class FormHelper extends Helper
         $this->moreElementsQuestion = new ConfirmationQuestion(
             "<question>Do you want to add another element (y/n)?</question> \n", false
         );
+        $this->isOptionalQuestion = new ConfirmationQuestion("\n<question>Is this element optional (y/n)?</question>\n");
     }
 
     /**
@@ -110,7 +114,9 @@ class FormHelper extends Helper
             $choices = $this->addChoices($input, $output);
         }
 
-        $this->elements[$name] = ['type' => $type, 'choices' => $choices];
+        $isOptional = $this->isOptional($input, $output);
+
+        $this->elements[$name] = ['type' => $type, 'choices' => $choices, 'optional' => $isOptional];
     }
 
     /**
@@ -148,6 +154,19 @@ class FormHelper extends Helper
         $question = $this->getHelperSet()->get('question');
 
         return $question->ask($input, $output, $this->moreElementsQuestion);
+    }
+
+    /**
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     * @return boolean
+     */
+    protected function isOptional(InputInterface $input, OutputInterface $output)
+    {
+        /** @var QuestionHelper $question */
+        $question = $this->getHelperSet()->get('question');
+
+        return $question->ask($input, $output, $this->isOptionalQuestion);
     }
 
     /**

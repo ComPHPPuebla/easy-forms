@@ -12,7 +12,7 @@ class {{ form.className() }} extends Form
     {
         $this
     {% for name, class in form.elements() %}
-        ->add(new {{ class.getShortName() }}('{{ name }}', {% if class.hasChoices() %}[{% for value, label in class.choices() %}'{{ value }}' => '{{ label }}'{% if not loop.last %}, {% endif %}{% endfor %}]{% endif %}))
+        ->add({{ class|raw }})
     {% endfor %}
     ;
     }

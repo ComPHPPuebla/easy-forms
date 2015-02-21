@@ -33,3 +33,6 @@ menu:
         dynamic:
             text: Dynamic modification
             relativeUrl: docs/dynamic-modification.html
+        code:
+            text: Generating code
+            relativeUrl: docs/code-generation.html

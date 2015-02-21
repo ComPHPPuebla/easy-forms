@@ -56,8 +56,7 @@ class GenerateFormCommand extends Command
         /** @var FormHelper $formHelper */
         $formHelper = $this->getHelper('form');
 
-        $output->writeln("\n<comment>Specify the elements for:</comment>");
-        $output->writeln("<info>{$input->getArgument('class')}</info>\n\n");
+        $output->writeln("\n<comment>Generating the code for:</comment> <info>{$input->getArgument('class')}</info>\n");
 
         $this->metadata->populate($input->getArgument('class'), $formHelper->addElements($input, $output));
         $this->metadata->setTargetDirectory($input->getArgument('directory'));

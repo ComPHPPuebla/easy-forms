@@ -67,26 +67,22 @@ class FormHelper extends Helper
     {
         $this->elements = [];
         $this->elementTypes = $elementTypes;
-        $this->nameQuestion = new Question("\n<question>What is the name of your element?</question>\n> ");
-        $this->typeQuestion = new ChoiceQuestion(
-            '<question>What kind of element do you want to add?</question>', array_keys($elementTypes)
-        );
+        $this->nameQuestion = new Question("\n<question>Enter the element name</question>\n > ");
+        $this->typeQuestion = new ChoiceQuestion('<question>What\'s its type?</question>', array_keys($elementTypes));
         $this->choicesQuestion = new ConfirmationQuestion(
-            "<question>Do you want to add choices to this element (y/n)?</question> \n", false
+            "<question>Do you want to add choices to this element (y/n)?</question> \n > ", false
         );
-        $this->valueQuestion = new Question("\n<question>Enter the item's value</question>\n> ");
-        $this->labelQuestion = new Question("\n<question>Enter the item's label</question>\n> ");
+        $this->valueQuestion = new Question("\n<question>Enter the choice value</question>\n > ");
+        $this->labelQuestion = new Question("\n<question>Enter the choice label</question>\n > ");
         $this->moreChoicesQuestion = new ConfirmationQuestion(
-            "\n<question>Do you want to add another choice to this element (y/n)?</question> \n", false
+            "\n<question>Do you want to add another choice (y/n)?</question> \n > ", false
         );
         $this->moreElementsQuestion = new ConfirmationQuestion(
-            "<question>Do you want to add another element (y/n)?</question> \n", false
+            "\n<question>Do you want to add another element (y/n)?</question>\n > ", false
         );
-        $this->isOptionalQuestion = new ConfirmationQuestion(
-            "\n<question>Is this element optional (y/n)?</question>\n"
-        );
+        $this->isOptionalQuestion = new ConfirmationQuestion("<question>Is it optional (y/n)?</question>\n > ");
         $this->multipleSelectionQuestion = new ConfirmationQuestion(
-            "\n<question>Allow multiple selection (y/n)?</question>\n"
+            "\n<question>Allow multiple selection (y/n)?</question>\n > "
         );
         $this->checkboxValueQuestion = new Question("\n<question>Enter the checkbox value</question>\n> ");
     }
@@ -122,7 +118,7 @@ class FormHelper extends Helper
         $type = $question->ask($input, $output, $this->typeQuestion);
 
         $choices = [];
-        if ($this->elementTypes[$type]->isSubclassOf(Choice::class) &&
+        if (in_array($type, ['checkbox multiple', 'select', 'radio']) &&
             $question->ask($input, $output, $this->choicesQuestion)
         ) {
             $choices = $this->addChoices($input, $output);
@@ -131,14 +127,14 @@ class FormHelper extends Helper
         $isOptional = $this->isOptional($input, $output);
 
         $multipleSelection = false;
-        if ($this->elementTypes[$type]->name === Select::class &&
+        if ($this->elementTypes[$type] === Select::class &&
             $question->ask($input, $output, $this->multipleSelectionQuestion)
         ) {
             $multipleSelection = true;
         }
 
         $checkboxValue = null;
-        if ($this->elementTypes[$type]->name === Checkbox::class) {
+        if ($this->elementTypes[$type] === Checkbox::class) {
             $checkboxValue = $question->ask($input, $output, $this->checkboxValueQuestion);
         }
 

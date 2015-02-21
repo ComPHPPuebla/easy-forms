@@ -49,15 +49,15 @@ class FormMetadata
     public function __construct()
     {
         $this->types = [
-            'text' => new ElementMetadata(Text::class),
-            'text area' => new ElementMetadata(TextArea::class),
-            'password' => new ElementMetadata(Password::class),
-            'hidden' => new ElementMetadata(Hidden::class),
-            'checkbox' => new ElementMetadata(Checkbox::class),
-            'file' => new ElementMetadata(File::class),
-            'radio' => new ElementMetadata(Radio::class),
-            'select' => new ElementMetadata(Select::class),
-            'checkbox multiple' => new ElementMetadata(MultiCheckbox::class),
+            'text' => Text::class,
+            'text area' => TextArea::class,
+            'password' => Password::class,
+            'hidden' => Hidden::class,
+            'checkbox' => Checkbox::class,
+            'file' => File::class,
+            'radio' => Radio::class,
+            'select' => Select::class,
+            'checkbox multiple' => MultiCheckbox::class,
         ];
     }
 
@@ -103,7 +103,7 @@ class FormMetadata
         Assertion::inArray($options['type'], array_keys($this->types), "'{$options['type']}' is not a valid type");
 
         /** @var ElementMetadata $element */
-        $element = $this->types[$options['type']];
+        $element = new ElementMetadata($this->types[$options['type']]);
 
         $element->setElementName($name);
         $element->configure($options);

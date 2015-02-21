@@ -24,6 +24,9 @@ class ElementMetadata extends ReflectionClass
     /** @var boolean */
     protected $multipleSelection = false;
 
+    /** @var string */
+    protected $value;
+
     /**
      * @param string $name
      */
@@ -40,6 +43,7 @@ class ElementMetadata extends ReflectionClass
         isset($options['choices']) && $this->choices = $options['choices'];
         $this->isOptional = $options['optional'];
         $this->multipleSelection = $options['multipleSelection'];
+        $this->value = $options['value'];
     }
 
     /**
@@ -48,13 +52,18 @@ class ElementMetadata extends ReflectionClass
     public function __toString()
     {
         $choices = '';
-        !empty($this->choices) && $choices= ", {$this->formatChoices()}";
+        !empty($this->choices) && $choices = ", {$this->formatChoices()}";
 
-        $element = "new {$this->getShortName()}('{$this->elementName}'{$choices})";
+        $value = '';
+        !empty($this->value) && $value = ", '{$this->value}'";
 
-        $this->isOptional && $element = "({$element})->makeOptional()";
+        $element = "new {$this->getShortName()}('{$this->elementName}'{$value}{$choices})";
 
-        $this->multipleSelection && $element = "{$element}->enableMultipleSelection()";
+        $methods = '';
+        $this->isOptional && $methods .= '->makeOptional()';
+        $this->multipleSelection && $methods .= '->enableMultipleSelection()';
+
+        !empty($methods) && $element = "({$element}){$methods}";
 
         return $element;
     }

@@ -9,6 +9,7 @@
 namespace EasyForms\Bridges\Symfony\Console\Helper;
 
 use EasyForms\CodeGeneration\Forms\FormMetadata;
+use EasyForms\Elements\Checkbox;
 use EasyForms\Elements\Choice;
 use EasyForms\Elements\Select;
 use Symfony\Component\Console\Helper\Helper;
@@ -54,6 +55,9 @@ class FormHelper extends Helper
     /** @var ConfirmationQuestion */
     protected $multipleSelectionQuestion;
 
+    /** @var Question */
+    protected $checkboxValueQuestion;
+
     /**
      * Initialize questions to be asked to user when building a form
      *
@@ -84,6 +88,7 @@ class FormHelper extends Helper
         $this->multipleSelectionQuestion = new ConfirmationQuestion(
             "\n<question>Allow multiple selection (y/n)?</question>\n"
         );
+        $this->checkboxValueQuestion = new Question("\n<question>Enter the checkbox value</question>\n> ");
     }
 
     /**
@@ -123,6 +128,8 @@ class FormHelper extends Helper
             $choices = $this->addChoices($input, $output);
         }
 
+        $isOptional = $this->isOptional($input, $output);
+
         $multipleSelection = false;
         if ($this->elementTypes[$type]->name === Select::class &&
             $question->ask($input, $output, $this->multipleSelectionQuestion)
@@ -130,13 +137,17 @@ class FormHelper extends Helper
             $multipleSelection = true;
         }
 
-        $isOptional = $this->isOptional($input, $output);
+        $checkboxValue = null;
+        if ($this->elementTypes[$type]->name === Checkbox::class) {
+            $checkboxValue = $question->ask($input, $output, $this->checkboxValueQuestion);
+        }
 
         $this->elements[$name] = [
             'type' => $type,
             'choices' => $choices,
             'optional' => $isOptional,
-            'multipleSelection' => $multipleSelection
+            'multipleSelection' => $multipleSelection,
+            'value' => $checkboxValue,
         ];
     }
 

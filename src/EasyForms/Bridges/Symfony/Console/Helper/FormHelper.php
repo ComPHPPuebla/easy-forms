@@ -10,6 +10,7 @@ namespace EasyForms\Bridges\Symfony\Console\Helper;
 
 use EasyForms\CodeGeneration\Forms\FormMetadata;
 use EasyForms\Elements\Choice;
+use EasyForms\Elements\Select;
 use Symfony\Component\Console\Helper\Helper;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputInterface;
@@ -50,6 +51,9 @@ class FormHelper extends Helper
     /** @var ConfirmationQuestion */
     protected $isOptionalQuestion;
 
+    /** @var ConfirmationQuestion */
+    protected $multipleSelectionQuestion;
+
     /**
      * Initialize questions to be asked to user when building a form
      *
@@ -74,7 +78,12 @@ class FormHelper extends Helper
         $this->moreElementsQuestion = new ConfirmationQuestion(
             "<question>Do you want to add another element (y/n)?</question> \n", false
         );
-        $this->isOptionalQuestion = new ConfirmationQuestion("\n<question>Is this element optional (y/n)?</question>\n");
+        $this->isOptionalQuestion = new ConfirmationQuestion(
+            "\n<question>Is this element optional (y/n)?</question>\n"
+        );
+        $this->multipleSelectionQuestion = new ConfirmationQuestion(
+            "\n<question>Allow multiple selection (y/n)?</question>\n"
+        );
     }
 
     /**
@@ -114,9 +123,21 @@ class FormHelper extends Helper
             $choices = $this->addChoices($input, $output);
         }
 
+        $multipleSelection = false;
+        if ($this->elementTypes[$type]->name === Select::class &&
+            $question->ask($input, $output, $this->multipleSelectionQuestion)
+        ) {
+            $multipleSelection = true;
+        }
+
         $isOptional = $this->isOptional($input, $output);
 
-        $this->elements[$name] = ['type' => $type, 'choices' => $choices, 'optional' => $isOptional];
+        $this->elements[$name] = [
+            'type' => $type,
+            'choices' => $choices,
+            'optional' => $isOptional,
+            'multipleSelection' => $multipleSelection
+        ];
     }
 
     /**

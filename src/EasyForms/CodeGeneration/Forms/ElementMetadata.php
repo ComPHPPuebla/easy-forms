@@ -21,6 +21,9 @@ class ElementMetadata extends ReflectionClass
     /** @var boolean */
     protected $isOptional = false;
 
+    /** @var boolean */
+    protected $multipleSelection = false;
+
     /**
      * @param string $name
      */
@@ -29,10 +32,14 @@ class ElementMetadata extends ReflectionClass
         $this->elementName = $name;
     }
 
+    /**
+     * @param array $options
+     */
     public function configure(array $options)
     {
         isset($options['choices']) && $this->choices = $options['choices'];
         $this->isOptional = $options['optional'];
+        $this->multipleSelection = $options['multipleSelection'];
     }
 
     /**
@@ -46,6 +53,8 @@ class ElementMetadata extends ReflectionClass
         $element = "new {$this->getShortName()}('{$this->elementName}'{$choices})";
 
         $this->isOptional && $element = "({$element})->makeOptional()";
+
+        $this->multipleSelection && $element = "{$element}->enableMultipleSelection()";
 
         return $element;
     }

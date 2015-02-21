@@ -10,7 +10,6 @@ namespace EasyForms\Bridges\Symfony\Console\Helper;
 
 use EasyForms\CodeGeneration\Forms\FormMetadata;
 use EasyForms\Elements\Checkbox;
-use EasyForms\Elements\Choice;
 use EasyForms\Elements\Select;
 use Symfony\Component\Console\Helper\Helper;
 use Symfony\Component\Console\Helper\QuestionHelper;

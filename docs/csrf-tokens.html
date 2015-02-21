@@ -76,6 +76,11 @@
                                             Dynamic modification
                                         </a>
                                     </li>
+                                                                    <li class="">
+                                        <a href="http://ComPHPPuebla.github.io/easy-forms/docs/code-generation.html">
+                                            Generating code
+                                        </a>
+                                    </li>
                                                             </ul>
                         
                     </nav>
@@ -106,7 +111,7 @@ class LoginForm extends Form
 }</code></pre>
 <p>A <code>Csrf</code> form element requires a name (as any element) an identifier for the token
 and a <code>TokenProvider</code> object. We can configure a Symfony2 token provider as follows:</p>
-<pre><code class="language-php">use EasyForms\Bridges\SymfonyCsrf\CsrfTokenProvider;
+<pre><code class="language-php">use EasyForms\Bridges\Symfony\Security\CsrfTokenProvider;
 use Symfony\Component\Security\Csrf\CsrfTokenManager;
 use Symfony\Component\Security\Csrf\TokenGenerator\UriSafeTokenGenerator;
 use Symfony\Component\Security\Csrf\TokenStorage\NativeSessionTokenStorage;

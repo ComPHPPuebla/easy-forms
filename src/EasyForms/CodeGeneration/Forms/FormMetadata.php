@@ -8,6 +8,7 @@
  */
 namespace EasyForms\CodeGeneration\Forms;
 
+use Assert\Assertion;
 use EasyForms\Elements\Checkbox;
 use EasyForms\Elements\File;
 use EasyForms\Elements\Hidden;
@@ -99,6 +100,8 @@ class FormMetadata
      */
     protected function addElement($name, array $options)
     {
+        Assertion::inArray($options['type'], array_keys($this->types), "'{$options['type']}' is not a valid type");
+
         /** @var ElementMetadata $element */
         $element = $this->types[$options['type']];
 
@@ -130,14 +133,6 @@ class FormMetadata
     public function setTargetDirectory($targetDirectory)
     {
         $this->targetDirectory = $targetDirectory;
-    }
-
-    /**
-     * @return string
-     */
-    public function targetDirectory()
-    {
-        return $this->targetDirectory;
     }
 
     /**

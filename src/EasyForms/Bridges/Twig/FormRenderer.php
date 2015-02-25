@@ -10,6 +10,8 @@ namespace EasyForms\Bridges\Twig;
 
 use EasyForms\View\ElementView;
 use EasyForms\View\FormView;
+use RecursiveArrayIterator;
+use RecursiveIteratorIterator;
 use Twig_Template as Template;
 
 class FormRenderer
@@ -140,7 +142,8 @@ class FormRenderer
     public function renderErrors(ElementView $element)
     {
         return $this->renderBlock('errors', [
-            'errors' => $element->messages,
+            'errors' => new RecursiveIteratorIterator(new RecursiveArrayIterator($element->messages)),
+            'errors_count' => count($element->messages),
         ]);
     }
 

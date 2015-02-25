@@ -68,7 +68,7 @@
 {%- endblock select %}
 
 {% block errors -%}
-    {%- if errors|length > 0 -%}
+    {%- if errors_count > 0 -%}
         <ul class="list-unstyled">
             {%- for error in errors -%}
                 {%- if error is iterable -%}{% set error = error|join(',') %}{%- endif -%}

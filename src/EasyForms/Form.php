@@ -105,7 +105,7 @@ class Form
     public function setErrorMessages(array $messages)
     {
         foreach ($messages as $name => $message) {
-            $this->get($name)->setMessages($message);
+            $this->has($name) && $this->get($name)->setMessages($message);
         }
     }
 

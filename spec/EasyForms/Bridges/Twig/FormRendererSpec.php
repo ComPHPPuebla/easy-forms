@@ -18,6 +18,7 @@ use EasyForms\Elements\Text;
 use EasyForms\Form;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
+use RecursiveIteratorIterator;
 use Twig_Template as Template;
 
 class FormRendererSpec extends ObjectBehavior
@@ -144,9 +145,7 @@ class FormRendererSpec extends ObjectBehavior
 
         $this->renderErrors($usernameView);
 
-        $template->displayBlock('errors', [
-            'errors' => $usernameView->messages,
-        ], [])->shouldHaveBeenCalled();
+        $template->displayBlock('errors', Argument::type('array'), [])->shouldHaveBeenCalled();
     }
 
     function it_should_render_an_element_label(FormTheme $theme, Template $template)

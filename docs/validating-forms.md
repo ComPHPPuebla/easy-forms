@@ -4,9 +4,10 @@ Another concern related to forms is validation, you could keep on validating and
 sanitizing your form inputs without having to couple validation components to your
 form.
 
-If you are already using the Zend input filter package, you could validate your
-inputs and pass the error messages to your form so they can be rendered. Suppose
-you have this filter to validate your form.
+If you are already using the
+[Zend input filter package](https://packagist.org/packages/zendframework/zend-inputfilter),
+you could validate your inputs and pass the error messages to your form so they
+can be rendered. Suppose you have this filter to validate your form.
 
 ```php
 use Zend\Filter\StringTrim;

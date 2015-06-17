@@ -48,10 +48,15 @@ Run it using PHPUnit and PHPSpec:
 
 ```bash
 $ php bin/phpunit --testdox && php bin/phpspec run
- ```
+```
+
 ## License
 
 `EasyForms` is released under the MIT License.
+
+## Documentation
+
+For more details, please review the full [documentation][8].
 
 [1]: http://symfony.com/doc/current/components/form/introduction.html
 [2]: http://framework.zend.com/manual/current/en/modules/zend.form.intro.html
@@ -60,3 +65,4 @@ $ php bin/phpunit --testdox && php bin/phpspec run
 [5]: https://github.com/symfony/security-csrf
 [6]: http://framework.zend.com/manual/current/en/modules/zend.captcha.intro.html
 [7]: https://github.com/MontealegreLuis/easy-forms-examples
+[8]: http://comphppuebla.github.io/slim-modules/

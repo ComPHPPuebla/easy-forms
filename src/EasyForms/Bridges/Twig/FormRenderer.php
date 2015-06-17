@@ -16,7 +16,7 @@ use Twig_Template as Template;
 
 class FormRenderer
 {
-    /** @var Theme */
+    /** @var FormTheme */
     protected $theme;
 
     /** @var BlockOptions */
@@ -26,10 +26,10 @@ class FormRenderer
      * @param FormTheme $theme
      * @param BlockOptions $options
      */
-    public function __construct(FormTheme $theme, BlockOptions $options)
+    public function __construct(FormTheme $theme, BlockOptions $options = null)
     {
         $this->theme = $theme;
-        $this->options = $options;
+        $this->options = $options ?: new BlockOptions();
     }
 
     /**

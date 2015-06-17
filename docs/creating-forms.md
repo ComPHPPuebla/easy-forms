@@ -1,7 +1,7 @@
 # Creating forms
 
-The simplest way to create a form is inheriting from `EasyForms\Form` and add
-elements to it in its constructor.
+The simplest way to create a form is inheriting from `EasyForms\Form` class.
+Elements can be added within the constructor.
 
 ```php
 class LoginForm extends EasyForms\Form
@@ -55,8 +55,8 @@ $interests = $form->interests; // Form elements can be accessed through its name
 $interests->attributes; // Element's HTML attributes
 $interests->value;
 $interests->isRequired;
-$interests->isValid; // true if there's at least 1 error message
-$interests->messages; // validation messages
+$interests->isValid; // false if there's at least 1 error message
+$interests->messages; // validation messages, if any
 $interests->choices; // empty if the element is not a subclass of Choice
 $interests->isSelected('testing') // Helper method for elements with choices
 ```

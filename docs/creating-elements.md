@@ -1,7 +1,7 @@
 # Creating form elements
 
-The only required attribute for an element in this package is its name, and
-an optional set of choices.
+The only required attribute for an element is its name. You can also set
+choices for elements like selects, radio buttons and checkboxes.
 
 ```php
 use EasyForms\Elements;
@@ -45,5 +45,5 @@ $description->makeOptional();
 $password->setMessages(['Please enter your password']);
 ```
 
-Unlike other form components, elements in this package are not responsible of
-validation and filtering.
+Unlike other form components, elements are not responsible for validation
+and filtering.

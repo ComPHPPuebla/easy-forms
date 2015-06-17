@@ -33,8 +33,7 @@ $loader = new Twig_Loader([
 $twig = new Twig_Environment($loader);
 // use the Bootstrap 3 layout
 $renderer = new FormRenderer(
-    new FormTheme($twig, 'layouts/bootstrap.html.twig'),
-    new BlockOptions()
+    new FormTheme($twig, 'layouts/bootstrap.html.twig')
 );
 $twig->addExtension(new FormExtension($renderer));
 ```
@@ -50,8 +49,9 @@ $view->render('user/login.html.twig', [
 The extension defines some functions, among the most important are `form_start`,
 `form_end`, and `element_row`.
 
-The `element_row` defines 2 parameters, the form element, and an associative array
-of options. The options are not mandatory, and can be explained as follows:
+The `element_row` function defines 2 parameters, the form element, and an
+associative array of options. The options are not mandatory, and can be explained
+as follows:
 
 * `label`. The element 's label
 * `label_attr`. The label's HTML attributes
@@ -82,7 +82,7 @@ need to do 3 things:
 Suppose you have a `ProductForm` class with 3 form elements, a text element with the
 name of the product, a text area with an optional description, and another text
 element to enter a unit price. To add the current template to the theme you will need
-to use the `form_theme` token and pass the value `self` as argument, you can add more
+to use the `form_theme` token and pass the value `_self` as argument, you can add more
 than one template this way, therefore the value should be inside an array.
 
 ```twig
@@ -123,7 +123,7 @@ the `name` element as follows.
 </div>
 ```
 
-Another useful function is `form_rest` which renders all the elements of a form
+Another useful function is `form_rest` which renders all the elements in a form
 that haven't been rendered. This function does not need arguments, that's why
 it is recommended to use it only with elements that do not need special
 formatting or labels, like `hidden` elements. Then instead of rendering

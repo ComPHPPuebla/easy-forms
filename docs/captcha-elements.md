@@ -1,7 +1,7 @@
 # CAPTCHA elements
 
-This package allows you to add CAPTCHA elements to your forms using the Zend
-CAPTCHA package.
+This package allows you to add CAPTCHA elements to your forms using the [Zend
+CAPTCHA package](https://packagist.org/packages/zendframework/zend-captcha).
 
 Suppose you have a form to post comments to a Blog that you want to protect against
 SPAM. The form could look like the following:

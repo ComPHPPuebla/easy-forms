@@ -2,7 +2,9 @@
 
 In order to protect your application from Cross Site Request Forgery (CSRF) attacks
 you can generate and validate secret tokens and include them in your forms. This
-package integrates the Symfony Security CSRF package to do that task.
+package integrates the
+[Symfony Security CSRF package](https://packagist.org/packages/symfony/security-csrf)
+to do that task.
 
 Let's add a CSRF token to the `LoginForm` used in previous examples.
 

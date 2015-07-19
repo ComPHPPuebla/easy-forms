@@ -65,4 +65,4 @@ For more details, please review the full [documentation][8].
 [5]: https://github.com/symfony/security-csrf
 [6]: http://framework.zend.com/manual/current/en/modules/zend.captcha.intro.html
 [7]: https://github.com/MontealegreLuis/easy-forms-examples
-[8]: http://comphppuebla.github.io/slim-modules/
+[8]: http://comphppuebla.github.io/easy-forms/

@@ -87,13 +87,14 @@
 
                 
                 <section class="col-sm-offset-3 col-lg-offset-2 col-sm-9 col-lg-10">
-                    <h1>Validating forms</h1>
+                    <h1 id="validating-forms">Validating forms</h1>
 <p>Another concern related to forms is validation, you could keep on validating and
 sanitizing your form inputs without having to couple validation components to your
 form.</p>
-<p>If you are already using the Zend input filter package, you could validate your
-inputs and pass the error messages to your form so they can be rendered. Suppose
-you have this filter to validate your form.</p>
+<p>If you are already using the
+<a href="https://packagist.org/packages/zendframework/zend-inputfilter">Zend input filter package</a>,
+you could validate your inputs and pass the error messages to your form so they
+can be rendered. Suppose you have this filter to validate your form.</p>
 <pre><code class="language-php">use Zend\Filter\StringTrim;
 use Zend\InputFilter\Input;
 use Zend\InputFilter\InputFilter;

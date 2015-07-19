@@ -87,9 +87,9 @@
 
                 
                 <section class="col-sm-offset-3 col-lg-offset-2 col-sm-9 col-lg-10">
-                    <h1>Creating form elements</h1>
-<p>The only required attribute for an element in this package is its name, and
-an optional set of choices.</p>
+                    <h1 id="creating-form-elements">Creating form elements</h1>
+<p>The only required attribute for an element is its name. You can also set
+choices for elements like selects, radio buttons and checkboxes.</p>
 <pre><code class="language-php">use EasyForms\Elements;
 
 $name = new Elements\Text('name');
@@ -121,8 +121,8 @@ $interests-&gt;setChoices([
 <p>You can also make elements optional, and pass them error messages.</p>
 <pre><code class="language-php">$description-&gt;makeOptional();
 $password-&gt;setMessages(['Please enter your password']);</code></pre>
-<p>Unlike other form components, elements in this package are not responsible of
-validation and filtering.</p>
+<p>Unlike other form components, elements are not responsible for validation
+and filtering.</p>
                 </section>
 
             </div>

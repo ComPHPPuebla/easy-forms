@@ -87,10 +87,12 @@
 
                 
                 <section class="col-sm-offset-3 col-lg-offset-2 col-sm-9 col-lg-10">
-                    <h1>CSRF tokens</h1>
+                    <h1 id="csrf-tokens">CSRF tokens</h1>
 <p>In order to protect your application from Cross Site Request Forgery (CSRF) attacks
 you can generate and validate secret tokens and include them in your forms. This
-package integrates the Symfony Security CSRF package to do that task.</p>
+package integrates the
+<a href="https://packagist.org/packages/symfony/security-csrf">Symfony Security CSRF package</a>
+to do that task.</p>
 <p>Let's add a CSRF token to the <code>LoginForm</code> used in previous examples.</p>
 <pre><code class="language-php">use EasyForms\Elements\Csrf\TokenProvider;
 use EasyForms\Elements\Text;

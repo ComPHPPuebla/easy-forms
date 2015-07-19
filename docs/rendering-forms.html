@@ -87,7 +87,7 @@
 
                 
                 <section class="col-sm-offset-3 col-lg-offset-2 col-sm-9 col-lg-10">
-                    <h1>Rendering forms</h1>
+                    <h1 id="rendering-forms">Rendering forms</h1>
 <p>This package uses Twig and is heavily inspired by the way the Symfony2 form
 component renders a form. Form rendering can be customized through <em>themes</em>. A
 theme is a set of Twig templates which contain <em>blocks</em> to customize the way a
@@ -118,8 +118,7 @@ $loader = new Twig_Loader([
 $twig = new Twig_Environment($loader);
 // use the Bootstrap 3 layout
 $renderer = new FormRenderer(
-    new FormTheme($twig, 'layouts/bootstrap.html.twig'),
-    new BlockOptions()
+    new FormTheme($twig, 'layouts/bootstrap.html.twig')
 );
 $twig-&gt;addExtension(new FormExtension($renderer));</code></pre>
 <p>Once you have the form extension configured, you can pass your form to any Twig
@@ -129,8 +128,9 @@ template.</p>
 ]);</code></pre>
 <p>The extension defines some functions, among the most important are <code>form_start</code>,
 <code>form_end</code>, and <code>element_row</code>.</p>
-<p>The <code>element_row</code> defines 2 parameters, the form element, and an associative array
-of options. The options are not mandatory, and can be explained as follows:</p>
+<p>The <code>element_row</code> function defines 2 parameters, the form element, and an
+associative array of options. The options are not mandatory, and can be explained
+as follows:</p>
 <ul>
 <li><code>label</code>. The element 's label</li>
 <li><code>label_attr</code>. The label's HTML attributes</li>
@@ -157,7 +157,7 @@ need to do 3 things:</p>
 <p>Suppose you have a <code>ProductForm</code> class with 3 form elements, a text element with the
 name of the product, a text area with an optional description, and another text
 element to enter a unit price. To add the current template to the theme you will need
-to use the <code>form_theme</code> token and pass the value <code>self</code> as argument, you can add more
+to use the <code>form_theme</code> token and pass the value <code>_self</code> as argument, you can add more
 than one template this way, therefore the value should be inside an array.</p>
 <pre><code class="language-twig">{# Add this template to the theme #}
 {% form_theme [_self] %}
@@ -190,7 +190,7 @@ the <code>name</code> element as follows.</p>
     {{- element(element, {'class' =&gt; 'form-element'}, {'block': 'money'}) -}}
     {{- errors(element) -}}
 &lt;/div&gt;</code></pre>
-<p>Another useful function is <code>form_rest</code> which renders all the elements of a form
+<p>Another useful function is <code>form_rest</code> which renders all the elements in a form
 that haven't been rendered. This function does not need arguments, that's why
 it is recommended to use it only with elements that do not need special
 formatting or labels, like <code>hidden</code> elements. Then instead of rendering

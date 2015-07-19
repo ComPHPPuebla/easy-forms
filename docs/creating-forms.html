@@ -87,9 +87,9 @@
 
                 
                 <section class="col-sm-offset-3 col-lg-offset-2 col-sm-9 col-lg-10">
-                    <h1>Creating forms</h1>
-<p>The simplest way to create a form is inheriting from <code>EasyForms\Form</code> and add
-elements to it in its constructor.</p>
+                    <h1 id="creating-forms">Creating forms</h1>
+<p>The simplest way to create a form is inheriting from <code>EasyForms\Form</code> class.
+Elements can be added within the constructor.</p>
 <pre><code class="language-php">class LoginForm extends EasyForms\Form
 {
     public function __construct()
@@ -127,8 +127,8 @@ $interests = $form-&gt;interests; // Form elements can be accessed through its n
 $interests-&gt;attributes; // Element's HTML attributes
 $interests-&gt;value;
 $interests-&gt;isRequired;
-$interests-&gt;isValid; // true if there's at least 1 error message
-$interests-&gt;messages; // validation messages
+$interests-&gt;isValid; // false if there's at least 1 error message
+$interests-&gt;messages; // validation messages, if any
 $interests-&gt;choices; // empty if the element is not a subclass of Choice
 $interests-&gt;isSelected('testing') // Helper method for elements with choices</code></pre>
                 </section>
